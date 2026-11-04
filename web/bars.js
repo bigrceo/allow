@@ -11,7 +11,7 @@ function size() {
   bars = Array.from({ length: n }, (_, i) => ({ x: i / n, ph: Math.random() * 6.28, sp: 0.25 + Math.random() * 0.5, wd: 6 + Math.random() * 10 }));
 }
 // Brightness across the width: a hot band left of center, a second softer one right.
-const field = (x, t) => Math.exp(-((x - 0.55 - 0.05 * Math.sin(t * 0.21)) ** 2) / 0.016) + 0.7 * Math.exp(-((x - 0.92 - 0.04 * Math.cos(t * 0.17)) ** 2) / 0.01);
+const field = (x, t) => Math.exp(-((x - 0.64 - 0.03 * Math.sin(t * 0.21)) ** 2) / 0.008) + 0.7 * Math.exp(-((x - 0.92 - 0.04 * Math.cos(t * 0.17)) ** 2) / 0.01);
 function frame(ms) {
   const t = ms / 1000;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

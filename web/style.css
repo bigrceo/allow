@@ -317,3 +317,10 @@ nav#nav.mopen .wrap { -webkit-backdrop-filter: blur(18px) saturate(1.3); backdro
 .hero h1 { font-size: clamp(44px, 6.4vw, 92px); }
 .hero .seal { font-size: clamp(19px, 2.2vw, 24px); font-weight: 500; letter-spacing: -.02em; color: var(--paper); margin: 0 0 14px; }
 .hero .seal b { color: #FF7A3D; font-weight: 600; }
+/* Contrast: a scrim under the text column, opaque panels; the light lives in the gap between them. */
+.frame::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(90deg, rgba(10,8,7,.92) 0%, rgba(10,8,7,.82) 34%, rgba(10,8,7,.35) 52%, transparent 62%); }
+.frame > nav, .frame > header { position: relative; z-index: 1; }
+.hero .panel { background: rgba(14,11,10,.92); }
+.hero-grid > div:first-child { text-shadow: 0 2px 30px rgba(0,0,0,.7); }
+.hero p.lead { color: #f1ece4; }
+@media (max-width: 900px) { .frame::before { background: linear-gradient(180deg, rgba(10,8,7,.88), rgba(10,8,7,.7) 60%, rgba(10,8,7,.5)); } }
