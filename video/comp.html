@@ -2,125 +2,202 @@
 <html>
 <head>
 <meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
 <style>
-  /* "How it works" for Allow, 1920x1080, 30 s. Every frame is a pure function of t: render(t). */
+  /* Allow, "How it works" v2. 1920x1080, 32 s. Every frame is a pure function of t: render(t). */
   * { box-sizing: border-box; margin: 0; }
   html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; font-family: Inter, sans-serif; color: #F6F4EF; }
-  .layer { position: absolute; inset: 0; display: grid; place-items: center; }
-  .line { position: absolute; left: 0; right: 0; text-align: center; font-weight: 500; font-size: 64px; letter-spacing: -.035em; }
-  .w { display: inline-block; margin: 0 .13em; will-change: filter, opacity, transform; }
+  #stage { position: absolute; inset: 0; perspective: 2200px; }
+  .line { position: absolute; left: 0; right: 0; text-align: center; font-weight: 500; font-size: 62px; letter-spacing: -.035em; }
+  .w { display: inline-block; margin: 0 .13em; }
   .acc { color: #FF7A3D; }
   .small { font-size: 22px; font-weight: 600; letter-spacing: .32em; text-transform: uppercase; color: #cdbfb2; }
-  .screen { position: absolute; width: 1280px; height: 800px; border-radius: 22px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,180,130,.22), 0 60px 160px -40px rgba(255,90,31,.45); }
-  .screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .hl { position: absolute; border-radius: 14px; box-shadow: 0 0 0 2px #FF7A3D, 0 0 40px 6px rgba(255,90,31,.55); }
-  svg { overflow: visible; }
-  #stage { position: absolute; inset: 0; perspective: 1800px; }
-  .grain { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70% 70% at 50% 50%, transparent 60%, rgba(0,0,0,.6)); }
+  .vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(75% 75% at 50% 50%, transparent 55%, rgba(0,0,0,.75)); }
+  /* Browser window */
+  .win { position: absolute; border-radius: 18px; overflow: hidden; background: #0d0c0c; box-shadow: 0 0 0 1px rgba(255,190,150,.18), 0 50px 140px -30px rgba(255,90,31,.45), 0 30px 80px rgba(0,0,0,.6); }
+  .bar { height: 46px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: #161414; border-bottom: 1px solid rgba(255,255,255,.07); }
+  .bar i { width: 12px; height: 12px; border-radius: 50%; background: #3a3634; }
+  .url { margin: 0 auto; width: 460px; height: 28px; border-radius: 8px; background: #0c0b0b; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; color: #cbbfb4; }
+  .url b { color: #F6F4EF; font-weight: 500; }
+  .view { position: absolute; left: 0; right: 0; top: 46px; bottom: 0; overflow: hidden; }
+  .view .cam { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .view img { display: block; }
+  .cursor { position: absolute; width: 30px; height: 30px; z-index: 5; filter: drop-shadow(0 3px 6px rgba(0,0,0,.6)); }
+  .ripple { position: absolute; border-radius: 50%; border: 2px solid #FF7A3D; z-index: 4; }
+  .hl { position: absolute; border-radius: 14px; box-shadow: 0 0 0 2px #FF7A3D, 0 0 50px 8px rgba(255,90,31,.5); z-index: 3; }
+  /* Chat */
+  .chat { position: absolute; left: 330px; top: 200px; width: 1260px; height: 540px; border-radius: 20px; background: #121011; box-shadow: 0 0 0 1px rgba(255,190,150,.16), 0 50px 140px -30px rgba(255,90,31,.4); overflow: hidden; }
+  .chead { height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 26px; border-bottom: 1px solid rgba(255,255,255,.07); font-weight: 600; font-size: 19px; }
+  .chead .li { width: 24px; height: 24px; background: #D97757; -webkit-mask: url(claude.svg) center/contain no-repeat; }
+  .chead .mcp { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: #cbbfb4; }
+  .chead .mcp::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #3ccf7a; box-shadow: 0 0 10px #3ccf7a; }
+  .cbody { padding: 30px 40px; display: flex; flex-direction: column; gap: 16px; }
+  .ub { align-self: flex-end; max-width: 70%; padding: 16px 22px; border-radius: 18px; background: #2a2523; font-size: 24px; }
+  .tool { display: flex; align-items: center; gap: 16px; padding: 14px 18px; border-radius: 14px; box-shadow: inset 0 0 0 1px rgba(255,190,150,.18); background: rgba(255,90,31,.04); font-size: 19px; }
+  .tool .mk { width: 26px; height: 26px; flex: none; }
+  .tool code { font-family: "JetBrains Mono", monospace; font-size: 18px; color: #FFB36B; }
+  .tool .res { margin-left: auto; color: #d6ccc1; }
+  .tool .ok { color: #3ccf7a; margin-left: 10px; }
+  .ab { font-size: 24px; line-height: 1.5; color: #ece6dd; max-width: 92%; }
+  .ab b { color: #FF7A3D; font-weight: 600; }
+  /* Terminal */
+  .term { position: absolute; left: 300px; top: 150px; width: 1320px; height: 640px; border-radius: 18px; background: #0d0c0c; box-shadow: 0 0 0 1px rgba(255,190,150,.16), 0 50px 140px -30px rgba(255,90,31,.4); overflow: hidden; font-family: "JetBrains Mono", monospace; font-size: 27px; }
+  .term .tb { height: 46px; display: flex; gap: 8px; align-items: center; padding: 0 16px; background: #161414; }
+  .term .tb i { width: 12px; height: 12px; border-radius: 50%; background: #3a3634; }
+  .term pre { padding: 34px 40px; font: inherit; line-height: 1.75; white-space: pre-wrap; }
+  .c { color: #F6F4EF; } .c b { color: #FF5A1F; font-weight: 500; } .e { color: #ff7a5a; } .o { color: #9fd8a8; }
+  .caret { display: inline-block; width: 14px; height: 30px; background: #FF5A1F; vertical-align: -5px; }
 </style>
 </head>
 <body>
 <div id="stage"></div>
-<div class="grain"></div>
+<div class="vig"></div>
 <script>
 const P = "M44 8a36 36 0 1 0 36 36H44V8Z M52 0v36h36A36 36 0 0 0 52 0Z";
 const stage = document.getElementById("stage");
-const TERM = 0.3704; // terminal screenshot height / width
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
-const ease = (x) => 1 - Math.pow(1 - clamp(x), 4);          // out-quart
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 4);
 const inout = (x) => { x = clamp(x); return x < .5 ? 8 * x ** 4 : 1 - Math.pow(-2 * x + 2, 4) / 2; };
 const prog = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
 const env = (t, a, b, fi = .5, fo = .5) => Math.min(ease(prog(t, a, a + fi)), 1 - ease(prog(t, b - fo, b)));
+const mark = (c = "#FF5A1F") => `<svg viewBox="0 0 88 88"><path d="${P}" fill="${c}" fill-rule="evenodd"/></svg>`;
 
-// Words appear one by one out of a blur, like the reference.
-function words(text, t, start, step = .14, accent = []) {
+function words(text, t, start, step = .13, accent = []) {
   return text.split(" ").map((w, i) => {
     const k = ease(prog(t, start + i * step, start + i * step + .7));
-    const a = accent.includes(i) ? "acc" : "";
-    return `<span class="w ${a}" style="opacity:${k};filter:blur(${(1 - k) * 14}px);transform:translateY(${(1 - k) * 18}px)">${w}</span>`;
+    return `<span class="w ${accent.includes(i) ? "acc" : ""}" style="opacity:${k};filter:blur(${(1 - k) * 14}px);transform:translateY(${(1 - k) * 18}px)">${w}</span>`;
   }).join("");
 }
+const typed = (s, t, a, cps = 32) => s.slice(0, Math.max(0, Math.floor((t - a) * cps)));
 
-// Scenes: [start, end, draw(t, local, alpha)].
+// Camera keyframes: [time, scale, x, y] in page pixels (1440-wide page); eased between keys.
+function cam(t, keys) {
+  let i = 0; while (i < keys.length - 2 && t > keys[i + 1][0]) i++;
+  const [ta, ...a] = keys[i], [tb, ...b] = keys[i + 1], k = inout(prog(t, ta, tb));
+  return a.map((v, j) => lerp(v, b[j], k));
+}
+// Cursor path: [time, x, y, click?] in page pixels.
+function cursorAt(t, keys) {
+  let i = 0; while (i < keys.length - 2 && t > keys[i + 1][0]) i++;
+  const A = keys[i], B = keys[i + 1], k = inout(prog(t, A[0], B[0]));
+  return [lerp(A[1], B[1], k), lerp(A[2], B[2], k)];
+}
+// A browser window on a real page screenshot, with camera, cursor, clicks and highlights (page coords).
+function browser({ url, img, x = 290, y = 40, w = 1340, alpha, rx = 0, ry = 0, sc = 1, camKeys, curKeys, clicks = [], hls = [] }, t) {
+  const h = Math.round(w * 900 / 1440) + 46, f = w / 1440;
+  const [s, cx, cy] = cam(t, camKeys);
+  const [px, py] = cursorAt(t, curKeys);
+  const toView = (X, Y) => [(X - cx) * s * f, (Y - cy) * s * f];
+  const [vx, vy] = toView(px, py);
+  const rip = clicks.map(([ct, X, Y]) => { const k = prog(t, ct, ct + .6); if (k <= 0 || k >= 1) return ""; const [rx_, ry_] = toView(X, Y); const r = 10 + 50 * ease(k); return `<span class="ripple" style="left:${rx_ - r}px;top:${ry_ - r}px;width:${2 * r}px;height:${2 * r}px;opacity:${1 - k}"></span>`; }).join("");
+  const hl = hls.map(([a, X, Y, W, H]) => { const k = ease(prog(t, a, a + .5)); if (!k) return ""; const [hx, hy] = toView(X, Y); return `<span class="hl" style="left:${hx}px;top:${hy}px;width:${W * s * f}px;height:${H * s * f}px;opacity:${k}"></span>`; }).join("");
+  return `<div class="win" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;opacity:${alpha};transform:rotateX(${rx}deg) rotateY(${ry}deg) scale(${sc})">
+    <div class="bar"><i></i><i></i><i></i><div class="url"><span style="width:14px;height:14px;display:inline-block">${mark("#FF5A1F")}</span><b>useallow.xyz</b>${url}</div></div>
+    <div class="view"><div class="cam" style="transform:translate(${-cx * s * f}px,${-cy * s * f}px) scale(${s * f})"><img src="${img}" style="width:1440px;height:900px"></div>${hl}${rip}
+      <svg class="cursor" viewBox="0 0 24 24" style="left:${vx}px;top:${vy}px"><path d="M4 2l16 9-7 2-3 7z" fill="#fff" stroke="#000" stroke-width="1.2"/></svg></div></div>`;
+}
+
 const S = [
-  // 1. Most agents get an API key and nothing else.
-  [0, 3.8, (t, l, a) => {
-    const draw = ease(prog(t, .2, 2.8));
-    const ticks = ["0h", "1h", "2h", "3h", "4h", "5h", "6h"].map((h, i) => `<text x="${160 + i * 266}" y="610" fill="rgba(255,226,206,${.25 + .5 * (draw * 7 > i)})" font-size="20" text-anchor="middle">${h}</text>`).join("");
-    const x = 160 + draw * 1600;
-    return `<svg width="1920" height="1080" style="position:absolute;inset:0;opacity:${a}">
-      <defs><linearGradient id="ln" x1="0" x2="1"><stop offset="0" stop-color="#FF5A1F" stop-opacity="0"/><stop offset="1" stop-color="#FF7A3D"/></linearGradient><filter id="gl"><feGaussianBlur stdDeviation="6"/></filter></defs>
-      <line x1="160" y1="560" x2="1760" y2="560" stroke="rgba(255,226,206,.12)" stroke-width="2"/>
-      <line x1="160" y1="560" x2="${x}" y2="${560 - draw * 18}" stroke="url(#ln)" stroke-width="4"/>
-      <line x1="160" y1="560" x2="${x}" y2="${560 - draw * 18}" stroke="#FF5A1F" stroke-width="10" filter="url(#gl)" opacity=".6"/>
-      <circle cx="${x}" cy="${560 - draw * 18}" r="9" fill="#FFE0C9"/><circle cx="${x}" cy="${560 - draw * 18}" r="22" fill="#FF5A1F" opacity=".35" filter="url(#gl)"/>${ticks}</svg>
+  // 1. Hook.
+  [0, 3.6, (t, a) => {
+    const d = ease(prog(t, .2, 2.8)), x = 160 + d * 1600;
+    const ticks = [...Array(7)].map((_, i) => `<text x="${160 + i * 266}" y="610" fill="rgba(255,226,206,${d * 7 > i ? .75 : .2})" font-size="20" text-anchor="middle">${i}h</text>`).join("");
+    return `<svg width="1920" height="1080" style="position:absolute;inset:0;opacity:${a}"><defs><linearGradient id="ln" x1="0" x2="1"><stop offset="0" stop-color="#FF5A1F" stop-opacity="0"/><stop offset="1" stop-color="#FF7A3D"/></linearGradient><filter id="gl"><feGaussianBlur stdDeviation="6"/></filter></defs>
+      <line x1="160" y1="560" x2="1760" y2="560" stroke="rgba(255,226,206,.12)" stroke-width="2"/><line x1="160" y1="560" x2="${x}" y2="${560 - d * 18}" stroke="url(#ln)" stroke-width="4"/><line x1="160" y1="560" x2="${x}" y2="${560 - d * 18}" stroke="#FF5A1F" stroke-width="12" filter="url(#gl)" opacity=".6"/>
+      <circle cx="${x}" cy="${560 - d * 18}" r="9" fill="#FFE0C9"/><circle cx="${x}" cy="${560 - d * 18}" r="24" fill="#FF5A1F" opacity=".35" filter="url(#gl)"/>${ticks}</svg>
       <div class="line" style="top:300px;opacity:${a}">${words("Most AI agents get an API key.", t, .3, .14, [4, 5])}</div>`;
   }],
-  // 2. ...and spend without a limit: a gauge whose needle runs past the end.
-  [3.8, 7.8, (t, l, a) => {
-    const sw = inout(prog(t, 4.0, 6.6)), ang = -90 + sw * 205, r = 330, cx = 960, cy = 760;
-    const ticks = [...Array(19)].map((_, i) => { const q = (-90 + i * 10) * Math.PI / 180; return `<line x1="${cx + Math.sin(q) * (r - 14)}" y1="${cy - Math.cos(q) * (r - 14)}" x2="${cx + Math.sin(q) * (r - (i % 3 ? 0 : -14))}" y2="${cy - Math.cos(q) * (r - (i % 3 ? 0 : -14))}" stroke="rgba(255,226,206,.45)" stroke-width="2"/>`; }).join("");
-    const q = ang * Math.PI / 180, trail = [...Array(14)].map((_, i) => { const qq = (ang - i * 2.2) * Math.PI / 180; return `<line x1="${cx}" y1="${cy}" x2="${cx + Math.sin(qq) * (r - 30)}" y2="${cy - Math.cos(qq) * (r - 30)}" stroke="#FF7A3D" stroke-opacity="${.5 - i * .035}" stroke-width="2"/>`; }).join("");
-    const over = sw > .86;
-    return `<svg width="1920" height="1080" style="position:absolute;inset:0;opacity:${a}">
-      <defs><filter id="g2"><feGaussianBlur stdDeviation="10"/></filter><radialGradient id="dial" cx=".5" cy="1" r="1"><stop offset="0" stop-color="#FF5A1F" stop-opacity=".18"/><stop offset="1" stop-color="#FF5A1F" stop-opacity="0"/></radialGradient></defs>
-      <path d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="url(#dial)" stroke="rgba(255,150,90,.55)" stroke-width="3"/>
-      <path d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="none" stroke="#FF5A1F" stroke-width="12" opacity=".35" filter="url(#g2)"/>
+  // 2. ...and spend without a limit.
+  [3.6, 7.2, (t, a) => {
+    const sw = inout(prog(t, 3.8, 6.3)), ang = -90 + sw * 205, r = 330, cx = 960, cy = 760, q = ang * Math.PI / 180, over = sw > .86;
+    const ticks = [...Array(19)].map((_, i) => { const u = (-90 + i * 10) * Math.PI / 180, L = i % 3 ? 0 : 14; return `<line x1="${cx + Math.sin(u) * (r - 14)}" y1="${cy - Math.cos(u) * (r - 14)}" x2="${cx + Math.sin(u) * (r + L)}" y2="${cy - Math.cos(u) * (r + L)}" stroke="rgba(255,226,206,.45)" stroke-width="2"/>`; }).join("");
+    const trail = [...Array(16)].map((_, i) => { const u = (ang - i * 2.2) * Math.PI / 180; return `<line x1="${cx}" y1="${cy}" x2="${cx + Math.sin(u) * (r - 30)}" y2="${cy - Math.cos(u) * (r - 30)}" stroke="#FF7A3D" stroke-opacity="${.5 - i * .03}" stroke-width="2"/>`; }).join("");
+    return `<svg width="1920" height="1080" style="position:absolute;inset:0;opacity:${a}"><defs><filter id="g2"><feGaussianBlur stdDeviation="10"/></filter><radialGradient id="dial" cx=".5" cy="1" r="1"><stop offset="0" stop-color="#FF5A1F" stop-opacity="${over ? .35 : .18}"/><stop offset="1" stop-color="#FF5A1F" stop-opacity="0"/></radialGradient></defs>
+      <path d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="url(#dial)" stroke="rgba(255,150,90,.55)" stroke-width="3"/><path d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="none" stroke="#FF5A1F" stroke-width="12" opacity=".35" filter="url(#g2)"/>
       ${ticks}${trail}<line x1="${cx}" y1="${cy}" x2="${cx + Math.sin(q) * (r - 30)}" y2="${cy - Math.cos(q) * (r - 30)}" stroke="#FFE0C9" stroke-width="4"/><circle cx="${cx}" cy="${cy}" r="10" fill="#FFE0C9"/>
       <text x="${cx}" y="${cy - 120}" text-anchor="middle" font-size="20" letter-spacing="6" fill="${over ? "#FF7A3D" : "rgba(255,226,206,.6)"}">SPENT · ${over ? "NO LIMIT" : "$" + Math.round(sw * 4800).toLocaleString("en-US")}</text></svg>
-      <div class="line" style="top:${cy - 290}px;opacity:${a}">${words("and spends without a limit.", t, 4.0, .14, [2, 3, 4])}</div>`;
+      <div class="line" style="top:${cy - 290}px;opacity:${a}">${words("and spends without a limit.", t, 3.8, .14, [2, 3, 4])}</div>`;
   }],
-  // 3. Introducing: the Allow mark in light, extruded and turning.
-  [7.8, 11.2, (t, l, a) => {
-    const intro = env(t, 7.9, 9.2, .5, .5), k = ease(prog(t, 8.6, 10.2)), rot = -38 + 58 * inout(prog(t, 8.6, 11.2)), sc = .7 + .35 * k;
-    const layers = [...Array(22)].map((_, i) => `<path d="${P}" fill="${i === 21 ? "url(#face)" : `rgb(${120 + i * 5},${36 + i * 2},${10 + i})`}" fill-rule="evenodd" transform="translate(${i * .55} ${i * .55})"/>`).join("");
-    return `<div class="line small" style="top:200px;opacity:${intro}">${words("Introducing", t, 7.9, .1)}</div>
-      <div style="position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;opacity:${k};transform:rotateY(${rot}deg) rotateX(${12 - 12 * k}deg) scale(${sc});filter:drop-shadow(0 0 ${30 + 40 * k}px rgba(255,90,31,.7))">
-        <svg viewBox="-6 -6 104 104" width="520" height="520"><defs><linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1E6"/><stop offset=".45" stop-color="#FF8A4C"/><stop offset="1" stop-color="#E4420E"/></linearGradient></defs>${layers}</svg></div>`;
+  // 3. Introducing the mark; it then flies into the camera as the transition.
+  [7.2, 10.4, (t, a) => {
+    const intro = env(t, 7.3, 9.0, .5, .5), k = ease(prog(t, 8.0, 9.4)), rot = -40 + 52 * inout(prog(t, 8.0, 10.0));
+    const fly = Math.pow(prog(t, 9.7, 10.4), 2), sc = (.7 + .3 * k) * (1 + fly * 7);
+    const layers = [...Array(24)].map((_, i) => `<path d="${P}" fill="${i === 23 ? "url(#face)" : `rgb(${110 + i * 5},${32 + i * 2},${8 + i})`}" fill-rule="evenodd" transform="translate(${i * .5} ${i * .5})"/>`).join("");
+    const sweep = 260 * prog(t, 9.0, 9.9) - 80;
+    return `<div class="line small" style="top:190px;opacity:${intro}">${words("Introducing", t, 7.3, .1)}</div>
+      <div style="position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;opacity:${k * (1 - fly)};transform:rotateY(${rot}deg) rotateX(${10 - 10 * k}deg) scale(${sc});filter:drop-shadow(0 0 ${30 + 50 * k}px rgba(255,90,31,.75)) blur(${fly * 10}px)">
+        <svg viewBox="-6 -6 104 104" width="520" height="520"><defs><linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1E6"/><stop offset=".45" stop-color="#FF8A4C"/><stop offset="1" stop-color="#E4420E"/></linearGradient>
+        <linearGradient id="sw" gradientUnits="userSpaceOnUse" x1="${sweep}" y1="0" x2="${sweep + 30}" y2="88"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>${layers}<path d="${P}" fill="url(#sw)" fill-rule="evenodd" transform="translate(11.5 11.5)"/></svg></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%, rgba(255,140,70,${fly * .9}), transparent ${30 + fly * 50}%)"></div>`;
   }],
-  // 4. A real screen: the site, tilted, dollying in.
-  [11.2, 15.0, (t, l, a) => {
-    const k = ease(prog(t, 11.2, 12.4)), d = inout(prog(t, 11.2, 15));
-    return `<div class="screen" style="left:320px;top:${80 - 20 * d}px;opacity:${a};transform:rotateX(${18 - 14 * d}deg) rotateY(${-16 + 12 * d}deg) scale(${.82 + .16 * d}) translateY(${(1 - k) * 80}px)"><img src="screens/hero.png"></div>
-      <div class="line" style="top:925px;opacity:${a}">${words("Give your agent a wallet.", t, 11.6, .12, [3, 4])}</div>`;
+  // 4. The real thing: Claude uses Allow's tools, one by one.
+  [10.4, 16.6, (t, a) => {
+    const show = (s0) => ease(prog(t, s0, s0 + .45));
+    const user = typed("Put $2 into BONK, then show me the receipt.", t, 10.9, 34);
+    const tool = (s0, name, args, res) => { const k = show(s0), done = t > s0 + .55; return `<div class="tool" style="opacity:${k};transform:translateY(${(1 - k) * 14}px)"><span class="mk">${mark()}</span><code>${name}</code><span style="color:#a89d92">${args}</span><span class="res">${done ? res + '<span class="ok">✓</span>' : '<span style="color:#a89d92">running…</span>'}</span></div>`; };
+    const reply = "Bought <b>625,200 BONK</b> for 0.02 SOL ($1.90). It's entry <b>#4</b> in the public registry, anchored on Solana. <b>$95.90</b> left today.";
+    const plain = reply.replace(/<[^>]+>/g, ""), n = Math.max(0, Math.floor((t - 14.5) * 120));
+    // reveal the reply character by character, keeping tags intact
+    let out = "", seen = 0; for (const part of reply.split(/(<[^>]+>)/)) { if (part.startsWith("<")) { out += part; continue; } const take = Math.max(0, Math.min(part.length, n - seen)); out += part.slice(0, take); seen += part.length; }
+    const z = ease(prog(t, 10.4, 11.2)), lift = inout(prog(t, 10.4, 16.6));
+    return `<div class="chat" style="opacity:${a};transform:rotateX(${8 - 8 * z}deg) translateY(${(1 - z) * 60 - 20 * lift}px) scale(${.94 + .06 * z})">
+      <div class="chead"><svg viewBox="0 0 24 24" width="24" height="24"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z" fill="#D97757"/></svg>Claude<span class="mcp">allow · MCP connected</span></div>
+      <div class="cbody">
+        <div class="ub" style="opacity:${show(10.8)}">${user || "&nbsp;"}${t < 12.3 ? '<span class="caret" style="width:3px;height:26px;background:#F6F4EF;margin-left:2px"></span>' : ""}</div>
+        ${tool(12.4, "allow_budget", "", "$25 per action · $97.90 left today")}
+        ${tool(13.0, "allow_quote", "buy BONK · 0.02 SOL", "625,200 BONK · route Scorch")}
+        ${tool(13.7, "allow_swap", "quote 4f2a…", "filled · registry #4")}
+        <div class="ab" style="opacity:${show(14.4)}">${t > 14.4 ? out : ""}</div>
+      </div></div>
+      <div class="line" style="top:860px;opacity:${a}">${words("Ask in words. It trades for real.", t, 11.0, .12, [4, 5, 6])}</div>`;
   }],
-  // 5. The allowance: caps the model can't raise.
-  [15.0, 18.6, (t, l, a) => {
-    const d = inout(prog(t, 15, 18.6)), h = ease(prog(t, 16.0, 16.8));
-    return `<div class="screen" style="left:320px;top:70px;opacity:${a};transform:rotateY(${10 - 8 * d}deg) rotateX(${6 - 4 * d}deg) scale(${.86 + .08 * d})"><img src="screens/dashboard.png">
-        <div class="hl" style="left:70px;top:232px;width:980px;height:136px;opacity:${h}"></div></div>
-      <div class="line" style="top:925px;opacity:${a}">${words("$25 per action. $100 a day. It can't raise them.", t, 15.3, .1, [0, 3])}</div>`;
+  // 5. The allowance, on the real dashboard.
+  [16.6, 20.6, (t, a) => {
+    const z = ease(prog(t, 16.6, 17.4));
+    return browser({ url: "/dashboard", img: "screens/dashboard.png", alpha: a, rx: 6 - 6 * z, sc: .94 + .06 * z,
+      camKeys: [[16.6, 1, 0, 0], [17.6, 1, 0, 0], [18.8, 1.55, 150, 230], [20.6, 1.6, 150, 240]],
+      curKeys: [[16.6, 1100, 700], [17.8, 900, 600], [18.6, 240, 520], [19.4, 250, 545], [20.6, 250, 545]],
+      clicks: [[19.4, 250, 545]], hls: [[18.9, 170, 265, 1100, 162], [19.6, 190, 518, 820, 90]] }, t)
+      + `<div class="line" style="top:955px;opacity:${a}">${words("$25 per action. $100 a day. It can't raise them.", t, 17.0, .1, [0, 3])}</div>`;
   }],
-  // 6. Over budget, it stops: the real terminal session.
-  [18.6, 22.2, (t, l, a) => {
-    const d = inout(prog(t, 18.6, 22.2)), flash = Math.max(0, Math.sin(prog(t, 19.8, 20.6) * Math.PI));
-    return `<div class="screen" style="width:1520px;height:${1520 * TERM}px;left:200px;top:${470 - 760 * TERM}px;opacity:${a};transform:rotateY(${-12 + 9 * d}deg) scale(${.84 + .1 * d});box-shadow:0 0 0 1px rgba(255,180,130,.22),0 0 ${80 * flash}px ${10 * flash}px rgba(255,80,40,.6),0 60px 160px -40px rgba(255,90,31,.45)"><img src="screens/terminal.png" style="object-fit:contain;background:#0e0e10"></div>
-      <div class="line" style="top:925px;opacity:${a}">${words("Over budget, it stops. Revoked, it stops.", t, 18.9, .12, [3, 6])}</div>`;
+  // 6. Over budget, it stops: a live terminal.
+  [20.6, 24.6, (t, a) => {
+    const L = [["c", "allow buy JUP 5", 20.9], ["e", "allow: $476.11 is over the per-action cap of $25. Nothing was done.", 21.7], ["c", "allow revoke --sweep", 22.3], ["o", '{ "revoked": true, "swept": "4xQ…9Lm" }', 23.0], ["c", "allow buy BONK 0.01", 23.2], ["e", "allow: This allowance was revoked by its owner. Nothing was done.", 23.9]];
+    let html = ""; for (const [k, s, at] of L) { if (t < at) break; html += k === "c" ? `<span class="c"><b>$</b> ${typed(s, t, at, 26)}</span>\n` : `<span class="${k}">${s}</span>\n`; }
+    const flash = Math.max(Math.sin(prog(t, 21.7, 22.3) * Math.PI), Math.sin(prog(t, 23.9, 24.5) * Math.PI));
+    const z = ease(prog(t, 20.6, 21.3)), d = inout(prog(t, 20.6, 24.6));
+    return `<div class="term" style="opacity:${a};transform:rotateY(${-8 + 6 * d}deg) scale(${.94 + .06 * z});box-shadow:0 0 0 1px rgba(255,190,150,.16),0 0 ${90 * flash}px ${12 * flash}px rgba(255,80,40,.55),0 50px 140px -30px rgba(255,90,31,.4)"><div class="tb"><i></i><i></i><i></i></div><pre>${html}<span class="caret" style="opacity:${Math.floor(t * 2) % 2}"></span></pre></div>
+      <div class="line" style="top:900px;opacity:${a}">${words("Over budget, it stops. Revoked, it stops.", t, 21.0, .12, [3, 6])}</div>`;
   }],
-  // 7. Every action, provable on Solana.
-  [22.2, 25.8, (t, l, a) => {
-    const d = inout(prog(t, 22.2, 25.8));
-    return `<div class="screen" style="left:320px;top:${80 - 20 * d}px;opacity:${a};transform:rotateX(${14 - 10 * d}deg) rotateY(${14 - 10 * d}deg) scale(${.84 + .12 * d})"><img src="screens/verify.png">
-        <div class="hl" style="left:144px;top:466px;width:694px;height:300px;opacity:${ease(prog(t, 23.4, 24.2))}"></div></div>
-      <div class="line" style="top:925px;opacity:${a}">${words("Every action, provable on Solana.", t, 22.5, .12, [3, 4])}</div>`;
+  // 7. Proof on the real verify page; the checks land one by one.
+  [24.6, 28.4, (t, a) => {
+    const z = ease(prog(t, 24.6, 25.3));
+    const rows = [640, 704, 768, 832], hide = rows.map((y, i) => t < 26.1 + i * .35 ? `<span style="position:absolute;left:350px;top:${y - 24}px;width:740px;height:62px;background:#141313"></span>` : "").join("");
+    const win = browser({ url: "/verify?seq=4", img: "screens/verify.png", alpha: a, ry: -6 + 6 * z, sc: .94 + .06 * z,
+      camKeys: [[24.6, 1, 0, 0], [25.4, 1, 0, 0], [26.4, 1.45, 260, 380], [28.4, 1.5, 270, 400]],
+      curKeys: [[24.6, 900, 700], [25.3, 600, 455], [25.6, 600, 455], [28.4, 640, 760]],
+      clicks: [[25.6, 600, 455]], hls: [[27.6, 340, 530, 780, 360]] }, t);
+    // mask the check rows until each one lands (drawn in page coords inside the camera)
+    return win.replace('style="width:1440px;height:900px">', `style="width:1440px;height:900px">${hide}`)
+      + `<div class="line" style="top:955px;opacity:${a}">${words("Every action, provable on Solana.", t, 25.0, .12, [3, 4])}</div>`;
   }],
-  // 8. The mark, the name, the line.
-  [25.8, 30, (t, l, a) => {
-    const k = ease(prog(t, 25.9, 26.9)), glow = .6 + .4 * Math.sin(t * 3);
-    return `<div style="position:absolute;left:50%;top:330px;margin-left:-70px;opacity:${k};transform:scale(${.8 + .2 * k});filter:drop-shadow(0 0 ${18 + 14 * glow}px rgba(255,90,31,.9))"><svg viewBox="0 0 88 88" width="140" height="140"><path d="${P}" fill="#FF5A1F" fill-rule="evenodd"/></svg></div>
-      <div class="line" style="top:510px;font-size:120px;font-weight:600;letter-spacing:-.05em">${words("Allow", t, 26.2)}</div>
-      <div class="line" style="top:680px;font-size:46px">${words("Sealed by your rules.", t, 26.9, .12, [0, 1, 2, 3])}</div>
-      <div class="line small" style="top:790px;opacity:${ease(prog(t, 27.8, 28.6))}">useallow.xyz · $ALLOW</div>`;
+  // 8. End card.
+  [28.4, 32, (t, a) => {
+    const k = ease(prog(t, 28.5, 29.4)), glow = .6 + .4 * Math.sin(t * 3);
+    return `<div style="position:absolute;left:50%;top:330px;width:140px;margin-left:-70px;opacity:${k};transform:scale(${.8 + .2 * k});filter:drop-shadow(0 0 ${18 + 16 * glow}px rgba(255,90,31,.9))">${mark()}</div>
+      <div class="line" style="top:510px;font-size:120px;font-weight:600;letter-spacing:-.05em">${words("Allow", t, 28.8)}</div>
+      <div class="line" style="top:680px;font-size:46px">${words("Sealed by your rules.", t, 29.4, .12, [0, 1, 2, 3])}</div>
+      <div class="line small" style="top:790px;opacity:${ease(prog(t, 30.2, 31))}">useallow.xyz</div>`;
   }],
 ];
 
 window.render = (t) => {
   let html = "";
-  for (const [a, b, f] of S) if (t >= a - .01 && t <= b + .6) html += f(t, t - a, env(t, a, b + .5, .45, .6));
+  for (const [a, b, f] of S) if (t >= a - .01 && t <= b + .5) html += f(t, env(t, a, b + .45, .45, .55));
   stage.innerHTML = html;
 };
-window.ready = Promise.all([document.fonts.ready, ...["hero", "dashboard", "terminal", "verify"].map((n) => new Promise((r) => { const i = new Image(); i.onload = r; i.src = `screens/${n}.png`; }))]);
+window.ready = Promise.all([document.fonts.ready, ...["dashboard", "verify"].map((n) => new Promise((r) => { const i = new Image(); i.onload = r; i.src = `screens/${n}.png`; }))]);
 render(0);
 </script>
 </body>

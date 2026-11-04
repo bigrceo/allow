@@ -4,7 +4,7 @@
 import { chromium } from "/Users/rayane/hush/node_modules/playwright-core/index.mjs";
 import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
-const FF = "/Users/rayane/clipfun/node_modules/ffmpeg-static/ffmpeg", FPS = 30, DUR = 30;
+const FF = "/Users/rayane/clipfun/node_modules/ffmpeg-static/ffmpeg", FPS = 30, DUR = 32;
 const browser = await chromium.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
 const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
 await page.goto("file://" + new URL("comp.html", import.meta.url).pathname);
