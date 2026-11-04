@@ -4,6 +4,7 @@ export const BRAND = {
   ticker: "ALLOT",
   domain: "allot.fun",
   x: "allotfun",
+  ca: "", // paste the pump.fun mint here at launch: nav, site and token section pick it up
   tagline: "Give your agent a wallet.",
   pitch: "Your agent gets a Solana wallet and an allotment. It pays APIs over x402, trades any token through Jupiter, and every action lands in a public registry anchored on Solana. Over budget, it stops. Revoked, it stops.",
   color: "#FF5A1F",

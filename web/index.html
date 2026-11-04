@@ -7,9 +7,11 @@
 <link rel="icon" href="/logo.svg"><link rel="stylesheet" href="/style.css">
 </head>
 <body>
+<div class="frame">
+<canvas id="bars" aria-hidden="true"></canvas><div class="glow" aria-hidden="true"></div>
 <nav><div class="wrap"></div></nav>
 
-<header class="hero"><div class="glow" aria-hidden="true"></div><div class="wrap hero-grid"><div>
+<header class="hero"><div class="wrap hero-grid"><div>
   <div class="label">Agent wallets on Solana</div>
   <h1>Give your agent <span class="accent">a wallet.</span></h1>
   <p class="lead">Claude, ChatGPT or any MCP client gets its own Solana wallet and an allotment. It pays APIs over x402, trades any token through Jupiter, and writes every action to a public registry anchored on chain. Over budget, it stops. Revoked, it stops.</p>
@@ -38,6 +40,11 @@
     </div>
   </div>
 </div></header>
+</div>
+<div class="marquee" aria-hidden="true"><div>
+  <span>Any Solana token</span><span>x402 native</span><span>Caps it can't raise</span><span>Revoke in one command</span><span>Key stays on your machine</span><span>Merkle roots on Solana</span><span>Claude and ChatGPT</span><span>Jupiter routing</span><span>Honeypots refused</span><span>Verify in your browser</span>
+  <span>Any Solana token</span><span>x402 native</span><span>Caps it can't raise</span><span>Revoke in one command</span><span>Key stays on your machine</span><span>Merkle roots on Solana</span><span>Claude and ChatGPT</span><span>Jupiter routing</span><span>Honeypots refused</span><span>Verify in your browser</span>
+</div></div>
 <section class="stats"><div class="wrap grid4">
   <div><div class="big" id="sEntries">0</div><div class="label">Registry entries</div></div>
   <div><div class="big" id="sAnch">0</div><div class="label">Solana anchors</div></div>
@@ -58,6 +65,13 @@
     <div class="tool"><b>allot_swap</b> · filled · registry #4 · anchored on Solana</div>
     <div class="msg a">Bought 1,552,800 BONK for 0.05 SOL ($4.76). It's entry #4 in the public registry, anchored in a memo signed by my wallet. You have $95.24 left today.</div>
   </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="label">See it run</div>
+  <h2>One minute, real outputs.</h2>
+  <p class="lead">The commands and what they printed on a local validator: a wallet, an x402 payment, a buy, a refusal, a revocation.</p>
+  <div class="term" id="term"><div class="tbar"><i></i><i></i><i></i><span>allot</span></div><pre id="termOut"></pre></div>
 </div></section>
 
 <section><div class="wrap">
@@ -106,6 +120,16 @@ Nothing was done.</pre>
   <div class="cmd" style="margin-top:20px"><span class="label">CA</span><code id="ca">Drops at launch</code></div>
 </div></section>
 
+<section><div class="wrap" style="max-width:820px">
+  <div class="label">Questions</div>
+  <h2>Before you hand it the keys.</h2>
+  <details class="faq"><summary>Can the agent raise its own budget?</summary><p>No. None of the six tools writes the allotment. The owner controls answer only on this machine, never through a tunnel.</p></details>
+  <details class="faq"><summary>Who holds the key?</summary><p>You do. It's a file in <code>~/.allot</code> on your machine. Allot runs no custody server and never sees it.</p></details>
+  <details class="faq"><summary>Does it really trade?</summary><p>Yes, through Jupiter on mainnet when you switch live mode on. Until then every swap fills at the live Jupiter quote into a paper wallet and is marked simulated in the registry.</p></details>
+  <details class="faq"><summary>What stops a honeypot?</summary><p>Tokens whose creator can still freeze holders are refused. Thin liquidity, open mint and concentrated holders come back as warnings in the quote.</p></details>
+  <details class="faq"><summary>How is the registry public?</summary><p>Each entry is hash-chained and signed by the agent. Batches are rolled into a Merkle root posted as an SPL Memo signed by the same wallet. /verify checks all of it against a Solana RPC from your browser.</p></details>
+</div></section>
+
 <footer><div class="wrap row" style="justify-content:space-between">
   <span><span data-b="name">Allot</span> · <span data-b="domain">allot.fun</span> · MIT</span>
   <span>Non-custodial. Your agent's key never leaves your machine.</span>
@@ -128,20 +152,37 @@ function say(e) {
   return esc(e.kind);
 }
 const tag = (e) => ({ swap: e.data.side === "buy" ? "Buy" : "Sell", pay: "x402", revoke: "Revoke", "policy.set": "Allotment", "wallet.created": "Wallet" })[e.kind] ?? e.kind;
+// A tiny identicon from the address: two hues, a 3x3 mirrored grid.
+function ava(a) {
+  let h = 0; for (const ch of a) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const c1 = `hsl(${h % 360} 85% 60%)`, c2 = `hsl(${(h >> 8) % 360} 70% 35%)`;
+  const cells = [...Array(9)].map((_, i) => ((h >> (i + 3)) & 1 ? c1 : c2));
+  return `background:conic-gradient(${c1} 0 25%, ${c2} 0 50%, ${c1} 0 75%, ${c2} 0);--a:${cells[4]}`;
+}
+const counted = new Set();
+function count(el, to, fmt) {
+  if (counted.has(el.id)) { el.textContent = fmt(to); return; }
+  counted.add(el.id);
+  const t0 = performance.now();
+  const step = (t) => { const k = Math.min(1, (t - t0) / 1200); el.textContent = fmt(to * (1 - (1 - k) ** 3)); if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
 async function load() {
   const st = await (await fetch("/api/state")).json().catch(() => ({}));
   if (!st.ready) { $("#chatFeed").innerHTML = `<div class="it"><p>No agent yet. Run <code>npx allot-kit init</code>.</p></div>`; return; }
   const name = esc(st.wallet.address);
   $("#talk").textContent = st.budget.revoked ? "Revoked" : st.live ? "Live" : "Simulated fills";
-  $("#chatFeed").innerHTML = st.entries.slice(0, 12).map((e) => `<div class="it"><div class="ih"><b>agent ${short(st.wallet.address)}</b><span class="label">#${e.seq}</span><time>${ago(e.ts)}</time></div><p>${say(e)}</p></div>`).join("");
+  $("#chatFeed").innerHTML = st.entries.slice(0, 12).map((e) => `<div class="it av"><i class="ava" style="${ava(st.wallet.address)}"></i><div><div class="ih"><b>agent ${short(st.wallet.address)}</b><span class="label">#${e.seq}</span><time>${ago(e.ts)}</time></div><p>${say(e)}</p></div></div>`).join("");
   const acts = st.entries.filter((e) => e.kind === "swap" || e.kind === "pay").slice(0, 10);
   $("#actFeed").innerHTML = acts.length ? acts.map((e) => { const sig = e.data.signature; return `<div class="it"><div class="ih"><b>${tag(e)}</b><span class="label">${e.data.mode ?? st.cluster}</span><time>${ago(e.ts)}</time></div><p>${say(e).split(". ")[0]}.</p><div class="row lk">${sig ? `<a href="https://solscan.io/tx/${sig}${st.cluster === "mainnet" ? "" : st.cluster === "devnet" ? "?cluster=devnet" : "?cluster=custom&customUrl=" + encodeURIComponent(st.rpc)}" target="_blank" rel="noopener">Solscan ↗</a>` : ""}<a href="/verify?seq=${e.seq}">Verify ↗</a></div></div>`; }).join("") : `<div class="it"><p>No payment or trade yet.</p></div>`;
-  $("#sEntries").textContent = st.entries.length ? st.entries[0].seq + 1 : 0;
-  $("#sAnch").textContent = st.anchors.length;
-  $("#sSpent").textContent = `$${st.budget.usedTotalUsd.toFixed(2)}`;
-  $("#sLeft").textContent = `$${(st.budget.totalUsd - st.budget.usedTotalUsd).toFixed(2)}`;
+  count($("#sEntries"), st.entries.length ? st.entries[0].seq + 1 : 0, (n) => Math.round(n));
+  count($("#sAnch"), st.anchors.length, (n) => Math.round(n));
+  count($("#sSpent"), st.budget.usedTotalUsd, (n) => `$${n.toFixed(2)}`);
+  count($("#sLeft"), st.budget.totalUsd - st.budget.usedTotalUsd, (n) => `$${n.toFixed(2)}`);
 }
 load(); setInterval(load, 5000);
 </script>
+<script src="/bars.js" defer></script>
+<script src="/term.js" defer></script>
 </body>
 </html>
