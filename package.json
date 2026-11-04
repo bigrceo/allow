@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "node server.mjs",
     "mcp": "node mcp/server.mjs",
-    "test": "node --test test/merkle.test.mjs test/mcp.test.mjs",
+    "test": "node --test test/merkle.test.mjs test/mcp.test.mjs test/x402.test.mjs",
     "demo": "node scripts/demo.mjs",
     "pack": "mkdir -p web/downloads && npm pack --pack-destination web/downloads"
   },

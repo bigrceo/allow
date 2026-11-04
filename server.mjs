@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import { readFileSync, existsSync } from "node:fs";
 import { extname, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { Keypair } from "@solana/web3.js";
+import { Keypair, PublicKey } from "@solana/web3.js";
 import bs58 from "bs58";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
@@ -14,7 +14,9 @@ import { priceUsd, resolveToken } from "./lib/jupiter.mjs";
 import { anchors, entries, proofFor, record } from "./lib/registry.mjs";
 import { readJson, writeJson } from "./lib/store.mjs";
 import { getPolicy, loadAgent, setPolicy } from "./lib/wallet.mjs";
-import { NETWORK, requirement, settle } from "./lib/x402.mjs";
+import { NETWORK, requirement, settle, usdcMint, usdcRequirement } from "./lib/x402.mjs";
+import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import { connection } from "./lib/solana.mjs";
 import { registerTools } from "./mcp/tools.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
@@ -34,17 +36,32 @@ function seller() {
   return s;
 }
 const PAID = {
-  "/x402/price": { lamports: 1_000_000, description: "Live price, liquidity and safety flags of any Solana token" },
-  "/x402/sol": { lamports: 500_000, description: "SOL/USD spot from Jupiter" },
+  "/x402/price": { lamports: 1_000_000, micros: 100_000, description: "Live price, liquidity and safety flags of any Solana token" },
+  "/x402/sol": { lamports: 500_000, micros: 50_000, description: "SOL/USD spot from Jupiter" },
 };
+const sellerKey = () => Keypair.fromSecretKey(bs58.decode(seller().secretKey));
+// USDC needs the seller's token account to exist; created once, paid by the seller.
+let sellerAta;
+async function ensureSellerAta() {
+  const mint = usdcMint();
+  if (!mint) return false;
+  if (sellerAta === mint) return true;
+  try { await getOrCreateAssociatedTokenAccount(connection(), sellerKey(), new PublicKey(mint), sellerKey().publicKey); sellerAta = mint; return true; } catch { return false; }
+}
 
 async function paidEndpoint(req, res, url) {
   const spec = PAID[url.pathname];
-  const reqm = requirement({ resource: url.origin + url.pathname, description: spec.description, lamports: spec.lamports, payTo: seller().address });
+  const resource = url.origin + url.pathname, payTo = seller().address;
+  const accepts = [requirement({ resource, description: spec.description, lamports: spec.lamports, payTo })];
+  if (await ensureSellerAta()) accepts.unshift(usdcRequirement({ resource, description: spec.description, micros: spec.micros, payTo, feePayer: payTo }));
   const header = req.headers["x-payment"];
-  if (!header) return json(res, 402, { x402Version: 1, error: "X-PAYMENT header is required", accepts: [reqm] });
+  if (!header) return json(res, 402, { x402Version: 1, error: "X-PAYMENT header is required", accepts });
   let settled;
-  try { settled = await settle(header, reqm); } catch (e) { return json(res, 402, { x402Version: 1, error: e.message, accepts: [reqm] }); }
+  try {
+    let last;
+    for (const r of accepts) { try { settled = await settle(header, r, sellerKey()); break; } catch (e) { last = e; } }
+    if (!settled) throw last;
+  } catch (e) { return json(res, 402, { x402Version: 1, error: e.message, accepts }); }
   let out;
   if (url.pathname === "/x402/sol") out = { solUsd: await priceUsd("So11111111111111111111111111111111111111112") };
   else {

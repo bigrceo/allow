@@ -8,7 +8,7 @@ import { CLUSTER, HOME, LIVE_TRADING, SITE_URL } from "../lib/config.mjs";
 import * as core from "../lib/core.mjs";
 import { anchor, record } from "../lib/registry.mjs";
 import { readJson, writeJson } from "../lib/store.mjs";
-import { airdrop, createAgent, getPolicy, loadAgent, setPolicy, sweep } from "../lib/wallet.mjs";
+import { airdrop, localUsdc, createAgent, getPolicy, loadAgent, setPolicy, sweep } from "../lib/wallet.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const [cmd, ...args] = process.argv.slice(2);
@@ -20,7 +20,8 @@ const HELP = `${BRAND.name}. ${BRAND.tagline}
 
   allot init                  create the agent wallet and its allotment (${HOME})
   allot status                address, balance, allotment left
-  allot airdrop [sol]         devnet SOL to test with
+  allot airdrop [sol]         localnet/devnet SOL to test with
+  allot usdc [amount]         localnet test USDC (pays x402 with zero SOL)
   allot policy                show the allotment
   allot policy <field> <v>    perTxUsd | dailyUsd | totalUsd | maxSlippageBps | payHosts | tokens | owner | expiresAt
   allot pay <url>             pay an x402 endpoint
@@ -51,6 +52,7 @@ async function main() {
     case "status": show({ ...(await core.wallet()), budget: await core.budget() }); break;
     case "budget": show(await core.budget()); break;
     case "airdrop": { const a = need(); show({ signature: await airdrop(a.address, Number(args[0] || 1)), wallet: await core.wallet() }); break; }
+    case "usdc": { const a = need(); show({ ...(await localUsdc(a.address, Number(args[0] || 10))), wallet: await core.wallet() }); break; }
     case "policy": {
       if (!args.length) { show(getPolicy()); break; }
       const a = need();

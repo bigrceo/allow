@@ -7,7 +7,7 @@ allot policy perTxUsd 10
 allot policy dailyUsd 50
 allot policy owner <your wallet>     # for revoke --sweep
 ```
-Fund the printed address with SOL or USDC. Test first with `ALLOT_CLUSTER=localnet` (`solana-test-validator`, then `allot airdrop 2`) or devnet (faucet.solana.com: the RPC faucet is closed).
+Fund the printed address with USDC (enough for x402: the seller pays the fee) plus a little SOL to anchor and trade. Localnet: `allot usdc 10` mints test USDC. Test first with `ALLOT_CLUSTER=localnet` (`solana-test-validator`, then `allot airdrop 2`) or devnet (faucet.solana.com: the RPC faucet is closed).
 
 ## 2. Claude Desktop
 Settings → Developer → Edit Config:

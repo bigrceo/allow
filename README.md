@@ -12,7 +12,7 @@ claude mcp add allot -- npx -y https://allot.fun/downloads/allot-kit-0.1.0.tgz m
 |---|---|
 | MCP tools: `allot_wallet` `allot_budget` `allot_pay` `allot_quote` `allot_swap` `allot_token` `allot_history` | `mcp/tools.mjs` (stdio `mcp/server.mjs`, HTTP `/mcp/<key>`) |
 | Wallet + allotment (caps, pay list, token list, expiry, revoke, sweep) | `lib/wallet.mjs`, `lib/core.mjs#guard` |
-| x402 client and seller (Solana, `exact` scheme) | `lib/x402.mjs`, demo endpoints `/x402/price`, `/x402/sol` |
+| x402 client and seller (Solana, `exact` scheme, USDC with seller-paid fee or SOL) | `lib/x402.mjs`, demo endpoints `/x402/price`, `/x402/sol` |
 | Trading (Jupiter, ported from SAY) | `lib/jupiter.mjs`, `lib/core.mjs#quote/swap` |
 | Registry: hash chain, ed25519, Merkle root in SPL Memo (from HUSH) | `lib/registry.mjs`, `lib/merkle.mjs`, `/verify` |
 | CLI | `bin/allot.mjs` |
