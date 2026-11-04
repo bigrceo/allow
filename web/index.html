@@ -90,7 +90,7 @@
     <div class="ac-top"><span class="ac-tag"><span data-logo></span>Allow agent</span><span class="ac-state" id="acState">Working</span></div>
     <div class="ac-ava" id="acAva"></div>
     <div class="ac-addr mono" id="acAddr">…</div>
-    <div class="ac-row"><div><b id="acBal">…</b><span>Balance</span></div><div><b id="acSpent">…</b><span>Spent of allowance</span></div><div><b id="acN">…</b><span>Registry entries</span></div></div>
+    <div class="ac-row"><div><b id="acBal">…</b><span>Allowance left</span></div><div><b id="acSpent">…</b><span>Spent of allowance</span></div><div><b id="acN">…</b><span>Registry entries</span></div></div>
     <svg class="spark" viewBox="0 0 300 60" preserveAspectRatio="none"><path id="acSpark" d=""/></svg>
     <div class="ac-hold" id="acHold"></div>
   </div>
@@ -234,6 +234,8 @@ function say(e) {
   return esc(e.kind);
 }
 const tag = (e) => ({ swap: e.data.side === "buy" ? "Buy" : "Sell", pay: "x402", revoke: "Revoke", "policy.set": "Allowance", "wallet.created": "Wallet" })[e.kind] ?? e.kind;
+// The agent wears the brand: the mark on the same orb as the X profile picture.
+const orbMark = `<svg viewBox="0 0 88 88"><path d="${BRAND.logoPath}" fill="#FF5A1F" fill-rule="evenodd"/></svg>`;
 // A tiny identicon from the address: two hues, a 3x3 mirrored grid.
 function ava(a) {
   let h = 0; for (const ch of a) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
@@ -256,15 +258,15 @@ async function load() {
   if (!st.ready) { $("#chatFeed").innerHTML = `<div class="it"><p>No agent yet. Run <code>allow init</code>.</p></div>`; return; }
   const name = esc(st.wallet.address);
   $("#talk").textContent = st.budget.revoked ? "Revoked" : st.live ? "Live" : "Simulated fills";
-  $("#chatFeed").innerHTML = st.entries.slice(0, 12).map((e) => `<div class="it av"><i class="ava" style="${ava(st.wallet.address)}"></i><div><div class="ih"><b>agent ${short(st.wallet.address)}</b><span class="label">#${e.seq}</span><time>${ago(e.ts)}</time></div><p>${say(e)}</p></div></div>`).join("");
+  $("#chatFeed").innerHTML = st.entries.slice(0, 12).map((e) => `<div class="it av"><i class="ava orb">${orbMark}</i><div><div class="ih"><b>agent ${short(st.wallet.address)}</b><span class="label">#${e.seq}</span><time>${ago(e.ts)}</time></div><p>${say(e)}</p></div></div>`).join("");
   const acts = st.entries.filter((e) => e.kind === "swap" || e.kind === "pay").slice(0, 10);
   $("#actFeed").innerHTML = acts.length ? acts.map((e) => { const sig = e.data.signature; return `<div class="it"><div class="ih"><b>${tag(e)}</b><span class="label">${e.data.mode ?? st.cluster}</span><time>${ago(e.ts)}</time></div><p>${say(e).split(". ")[0]}.</p><div class="row lk">${sig ? `<a href="https://solscan.io/tx/${sig}${st.cluster === "mainnet" ? "" : st.cluster === "devnet" ? "?cluster=devnet" : "?cluster=custom&customUrl=" + encodeURIComponent(st.rpc)}" target="_blank" rel="noopener">Solscan ↗</a>` : ""}<a href="/verify?seq=${e.seq}">Verify ↗</a></div></div>`; }).join("") : `<div class="it"><p>No payment or trade yet.</p></div>`;
   const b = st.budget, w = st.wallet;
   $("#rPer").textContent = `$${b.perActionUsd}`; $("#rDay").textContent = `$${b.dailyUsd}`; $("#rTot").textContent = `$${b.totalUsd}`; $("#rSlip").textContent = `${b.maxSlippagePct}%`;
-  $("#acAva").style.cssText = ava(w.address).replace(/conic-gradient\(/, "conic-gradient(from 30deg,");
+  $("#acAva").className = "ac-ava orb"; $("#acAva").innerHTML = orbMark;
   $("#acAddr").textContent = w.address;
   $("#acState").textContent = b.revoked ? "Revoked" : "Working"; $("#acState").style.color = b.revoked ? "#c0392b" : "";
-  $("#acBal").textContent = w.sol == null ? "?" : `${(+w.sol).toFixed(3)} SOL`;
+  $("#acBal").textContent = `$${(b.totalUsd - b.usedTotalUsd).toFixed(2)}`;
   $("#acSpent").textContent = `$${b.usedTotalUsd.toFixed(2)}`;
   $("#acN").textContent = st.entries.length ? st.entries[0].seq + 1 : 0;
   // Cumulative spend over the registry, oldest to newest.
