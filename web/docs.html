@@ -12,55 +12,55 @@
   <h2>Two minutes to a funded agent.</h2>
 
   <h3 style="margin-top:36px">1 · Create the wallet</h3>
-  <p>Node 20 or newer. The kit installs straight from this site (<code>npx allot-kit</code> once it is on npm). The key is written to <code>~/.allot/agent.json</code> (mode 600). It never leaves your machine.</p>
-  <pre>npm i -g https://allot.fun/downloads/allot-kit-0.1.0.tgz
-allot init
-allot policy perTxUsd 10      # cap per action
-allot policy dailyUsd 50      # cap per 24 h
-allot policy owner &lt;your wallet&gt;   # where revoke --sweep sends funds</pre>
-  <p>Fund it: USDC is enough to pay x402 APIs (the seller pays the network fee). Add a little SOL to anchor the registry and to trade. On localnet, <code>allot usdc 10</code> mints test USDC. Testing? <code>ALLOT_CLUSTER=devnet</code> (the default) or <code>localnet</code>.</p>
+  <p>Node 20 or newer. The kit installs straight from this site (<code>npx allow-kit</code> once it is on npm). The key is written to <code>~/.allow/agent.json</code> (mode 600). It never leaves your machine.</p>
+  <pre>npm i -g https://getallow.fun/downloads/allow-kit-0.1.0.tgz
+allow init
+allow policy perTxUsd 10      # cap per action
+allow policy dailyUsd 50      # cap per 24 h
+allow policy owner &lt;your wallet&gt;   # where revoke --sweep sends funds</pre>
+  <p>Fund it: USDC is enough to pay x402 APIs (the seller pays the network fee). Add a little SOL to anchor the registry and to trade. On localnet, <code>allow usdc 10</code> mints test USDC. Testing? <code>ALLOW_CLUSTER=devnet</code> (the default) or <code>localnet</code>.</p>
 
   <h3 style="margin-top:36px"><i class="li" style="--m:url(/logos/claude.svg);color:#D97757;vertical-align:-4px"></i> Claude Desktop</h3>
   <p>Settings → Developer → Edit Config, then add:</p>
   <pre>{
   "mcpServers": {
-    "allot": { "command": "npx", "args": ["-y", "https://allot.fun/downloads/allot-kit-0.1.0.tgz", "mcp"] }
+    "allow": { "command": "npx", "args": ["-y", "https://getallow.fun/downloads/allow-kit-0.1.0.tgz", "mcp"] }
   }
 }</pre>
-  <p>Restart Claude. Ask: <i>"What's my Allot budget?"</i></p>
+  <p>Restart Claude. Ask: <i>"What's my Allow budget?"</i></p>
 
   <h3 style="margin-top:36px"><i class="li" style="--m:url(/logos/claude.svg);color:#D97757;vertical-align:-4px"></i> Claude Code</h3>
-  <pre>claude mcp add allot -- npx -y https://allot.fun/downloads/allot-kit-0.1.0.tgz mcp</pre>
+  <pre>claude mcp add allow -- npx -y https://getallow.fun/downloads/allow-kit-0.1.0.tgz mcp</pre>
 
   <h3 style="margin-top:36px"><i class="li" style="--m:url(/logos/openai.svg);vertical-align:-4px"></i> ChatGPT</h3>
   <p>ChatGPT talks to remote MCP servers over HTTPS. Run the server and expose it with a tunnel:</p>
-  <pre>allot serve                      # http://localhost:4340
+  <pre>allow serve                      # http://localhost:4340
 cloudflared tunnel --url http://localhost:4340
-allot config chatgpt             # prints the secret MCP path</pre>
-  <p>In ChatGPT: Settings → Apps &amp; Connectors → Advanced → Developer mode, then Create. Paste <code>https://&lt;tunnel&gt;/mcp/&lt;key&gt;</code>, authentication none. The key in the path is the secret; the owner controls (allotment, revoke) are never reachable through the tunnel.</p>
+allow config chatgpt             # prints the secret MCP path</pre>
+  <p>In ChatGPT: Settings → Apps &amp; Connectors → Advanced → Developer mode, then Create. Paste <code>https://&lt;tunnel&gt;/mcp/&lt;key&gt;</code>, authentication none. The key in the path is the secret; the owner controls (allowance, revoke) are never reachable through the tunnel.</p>
 
   <h3 style="margin-top:36px">CLI</h3>
-  <pre>allot status                 address, balance, allotment left
-allot pay &lt;url&gt;              pay an x402 endpoint
-allot buy BONK 0.05          quote + swap 0.05 SOL of BONK
-allot sell BONK 1000000
-allot history                the registry
-allot revoke --sweep         stop the agent, send funds home</pre>
+  <pre>allow status                 address, balance, allowance left
+allow pay &lt;url&gt;              pay an x402 endpoint
+allow buy BONK 0.05          quote + swap 0.05 SOL of BONK
+allow sell BONK 1000000
+allow history                the registry
+allow revoke --sweep         stop the agent, send funds home</pre>
 
   <h3 style="margin-top:36px">Trading modes</h3>
-  <p>Prices always come from Jupiter on mainnet. Off mainnet, a swap is <b>simulated</b>: it fills at the fresh Jupiter quote into a paper portfolio and is written to the registry as <code>simulated</code>. Real swaps need <code>ALLOT_CLUSTER=mainnet</code> <b>and</b> <code>ALLOT_LIVE=1</code>.</p>
+  <p>Prices always come from Jupiter on mainnet. Off mainnet, a swap is <b>simulated</b>: it fills at the fresh Jupiter quote into a paper portfolio and is written to the registry as <code>simulated</code>. Real swaps need <code>ALLOW_CLUSTER=mainnet</code> <b>and</b> <code>ALLOW_LIVE=1</code>.</p>
 
   <h3 style="margin-top:36px">What's enforced, and where</h3>
   <table>
     <tr><th class="label">Rule</th><th class="label">Enforced by</th></tr>
-    <tr><td>Per action, per 24 h, total caps</td><td>Allot, from the registry itself, before signing</td></tr>
-    <tr><td>Hosts it may pay</td><td>Allot, before the first byte is paid</td></tr>
-    <tr><td>Price floor of a trade</td><td>Allot re-quote, then Jupiter on chain</td></tr>
-    <tr><td>Freeze-authority tokens refused</td><td>Allot, from Jupiter's audit data</td></tr>
-    <tr><td>Revocation</td><td>Allot, on the next call; <code>--sweep</code> moves funds on chain</td></tr>
+    <tr><td>Per action, per 24 h, total caps</td><td>Allow, from the registry itself, before signing</td></tr>
+    <tr><td>Hosts it may pay</td><td>Allow, before the first byte is paid</td></tr>
+    <tr><td>Price floor of a trade</td><td>Allow re-quote, then Jupiter on chain</td></tr>
+    <tr><td>Freeze-authority tokens refused</td><td>Allow, from Jupiter's audit data</td></tr>
+    <tr><td>Revocation</td><td>Allow, on the next call; <code>--sweep</code> moves funds on chain</td></tr>
     <tr><td>Registry integrity</td><td>Hash chain + ed25519 + Merkle root in an SPL Memo</td></tr>
   </table>
-  <p>The caps run on your machine, next to the key. A model can't change them (no tool does), but anyone with shell access to the machine can. Keep the allotment small and the wallet a hot wallet.</p>
+  <p>The caps run on your machine, next to the key. A model can't change them (no tool does), but anyone with shell access to the machine can. Keep the allowance small and the wallet a hot wallet.</p>
 </main>
 <script type="module" src="/common.js"></script>
 <script src="/pixels.js" defer></script>

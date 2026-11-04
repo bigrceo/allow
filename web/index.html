@@ -13,10 +13,11 @@
 
 <header class="hero"><div class="wrap hero-grid"><div>
   <div class="label">Agent wallets on Solana</div>
-  <h1>Give your agent <span class="accent">a wallet.</span></h1>
-  <p class="lead">Claude, ChatGPT or any MCP client gets its own Solana wallet and an allotment. It pays APIs over x402, trades any token through Jupiter, and writes every action to a public registry anchored on chain. Over budget, it stops. Revoked, it stops.</p>
+  <h1>Give your agent a wallet. <span class="accent">Sealed by your rules.</span></h1>
+  <p class="seal">Your agent can trade. It can't touch more than you allow. <b>Nobody can.</b></p>
+  <p class="lead">Claude, ChatGPT or any MCP client gets its own Solana wallet and an allowance. It pays APIs over x402, trades any token through Jupiter, and writes every action to a public registry anchored on chain. Over budget, it stops. Revoked, it stops.</p>
   <div class="row" style="margin-top:28px">
-    <div class="cmd"><code data-install="init">npx allot-kit init</code><button data-copy="npx allot-kit init">Copy</button></div>
+    <div class="cmd"><code data-install="init">npx allow-kit init</code><button data-copy="npx allow-kit init">Copy</button></div>
     <a class="btn" href="/docs">Install</a>
     <a class="btn ghost" href="/dashboard">Dashboard</a>
   </div>
@@ -49,30 +50,30 @@
   <div><div class="slabel"><span data-logo></span>Registry entries</div><div class="big" id="sEntries">0</div></div>
   <div><div class="slabel"><span data-logo></span>Solana anchors</div><div class="big" id="sAnch">0</div></div>
   <div><div class="slabel"><span data-logo></span>Spent by the agent</div><div class="big" id="sSpent">$0</div></div>
-  <div><div class="slabel"><span data-logo></span>Left in the allotment</div><div class="big" id="sLeft">$0</div></div>
+  <div><div class="slabel"><span data-logo></span>Left in the allowance</div><div class="big" id="sLeft">$0</div></div>
 </div></section>
 
 
 <section class="trio"><div class="wrap">
-  <div class="label">Allot</div>
+  <div class="label">Allow</div>
   <h2 class="xl">A wallet. A budget. <span class="accent">A receipt.</span></h2>
   <p class="lead">One command gives your agent all three, and none of them depends on trusting the agent.</p>
   <div class="tcards">
     <a class="tcard" href="/docs"><i class="slab s1"></i><i class="slab s1b"></i><div><span class="label">01</span><h3>The wallet</h3><p>A Solana keypair on your machine. Fund it with USDC only: it pays x402 APIs without holding any SOL.</p><span class="more">Install it →</span></div></a>
-    <a class="tcard" href="/dashboard"><i class="slab s2"></i><i class="slab s2b"></i><div><span class="label">02</span><h3>The budget</h3><p>Caps per action, per day and in total, a pay list and a kill switch. The model can read them, never raise them.</p><span class="more">Set the allotment →</span></div></a>
+    <a class="tcard" href="/dashboard"><i class="slab s2"></i><i class="slab s2b"></i><div><span class="label">02</span><h3>The budget</h3><p>Caps per action, per day and in total, a pay list and a kill switch. The model can read them, never raise them.</p><span class="more">Set the allowance →</span></div></a>
     <a class="tcard" href="/verify"><i class="slab s3"></i><i class="slab s3b"></i><div><span class="label">03</span><h3>The receipt</h3><p>Every payment and trade is signed, hash-chained and anchored on Solana. Anyone can check one in a browser.</p><span class="more">Verify an entry →</span></div></a>
   </div>
 </div></section>
 
 <section><div class="wrap">
   <div class="row" style="justify-content:space-between;align-items:flex-end">
-    <div><div class="label">The allotment</div><h2 class="xl">Every move fits the budget.</h2><p class="lead" style="margin:0">Set by you, read live from this agent's policy, checked before anything is signed.</p></div>
+    <div><div class="label">The allowance</div><h2 class="xl">Every move fits the budget.</h2><p class="lead" style="margin:0">Set by you, read live from this agent's policy, checked before anything is signed.</p></div>
     <a class="btn ghost pill" href="/dashboard">Change the caps</a>
   </div>
   <div class="rules">
     <div class="rule"><span class="label">Per action</span><b id="rPer">$25</b><p>The most one payment or buy can cost.</p><span class="label foot">Before signing</span></div>
     <div class="rule"><span class="label">Per 24 h</span><b id="rDay">$100</b><p>Rolling window, counted from the public registry.</p><span class="label foot">Every action</span></div>
-    <div class="rule"><span class="label">In total</span><b id="rTot">$250</b><p>The whole allotment. Past it, the agent stops.</p><span class="label foot">Every action</span></div>
+    <div class="rule"><span class="label">In total</span><b id="rTot">$250</b><p>The whole allowance. Past it, the agent stops.</p><span class="label foot">Every action</span></div>
     <div class="rule"><span class="label">Slippage</span><b id="rSlip">5%</b><p>Max price drift. Re-quoted before signing, floor enforced on chain.</p><span class="label foot">Every trade</span></div>
     <div class="rule hot"><span class="label">Kill switch</span><b>1</b><p>Command to revoke. The next call fails, funds can sweep home.</p><span class="label foot">Owner only</span></div>
   </div>
@@ -86,10 +87,10 @@
     <a class="btn pill" href="/dashboard" style="margin-top:12px">Open the dashboard →</a>
   </div>
   <div class="agentcard">
-    <div class="ac-top"><span class="ac-tag"><span data-logo></span>Allot agent</span><span class="ac-state" id="acState">Working</span></div>
+    <div class="ac-top"><span class="ac-tag"><span data-logo></span>Allow agent</span><span class="ac-state" id="acState">Working</span></div>
     <div class="ac-ava" id="acAva"></div>
     <div class="ac-addr mono" id="acAddr">…</div>
-    <div class="ac-row"><div><b id="acBal">…</b><span>Balance</span></div><div><b id="acSpent">…</b><span>Spent of allotment</span></div><div><b id="acN">…</b><span>Registry entries</span></div></div>
+    <div class="ac-row"><div><b id="acBal">…</b><span>Balance</span></div><div><b id="acSpent">…</b><span>Spent of allowance</span></div><div><b id="acN">…</b><span>Registry entries</span></div></div>
     <svg class="spark" viewBox="0 0 300 60" preserveAspectRatio="none"><path id="acSpark" d=""/></svg>
     <div class="ac-hold" id="acHold"></div>
   </div>
@@ -150,7 +151,7 @@
   <div class="label">See it run</div>
   <h2>One minute, real outputs.</h2>
   <p class="lead">The commands and what they printed on a local validator: a wallet, an x402 payment, a buy, a refusal, a revocation.</p>
-  <div class="term" id="term"><div class="tbar"><i></i><i></i><i></i><span>allot</span></div><pre id="termOut"></pre></div>
+  <div class="term" id="term"><div class="tbar"><i></i><i></i><i></i><span>allow</span></div><pre id="termOut"></pre></div>
 </div></section>
 
 <section><div class="wrap">
@@ -158,19 +159,19 @@
   <h2>Seven tools. That's the kit.</h2>
   <div class="scroll"><table style="margin-top:20px">
     <tr><th class="label">Tool</th><th class="label">What it does</th></tr>
-    <tr><td><code>allot_wallet</code></td><td>Its address, balance, holdings and trading mode.</td></tr>
-    <tr><td><code>allot_budget</code></td><td>Caps, what's used, what's left. It checks before spending.</td></tr>
-    <tr><td><code>allot_pay</code></td><td>Fetches a URL and pays its x402 price in USDC (no SOL needed, the seller pays the fee) or SOL.</td></tr>
-    <tr><td><code>allot_quote</code></td><td>Prices a buy or sell of any token on Jupiter. Nothing moves.</td></tr>
-    <tr><td><code>allot_swap</code></td><td>Executes the quote, under the floor it showed.</td></tr>
-    <tr><td><code>allot_token</code></td><td>$ALLOT on chain: supply, price, market cap, largest holders.</td></tr>
-    <tr><td><code>allot_history</code></td><td>The public registry: every payment and trade.</td></tr>
+    <tr><td><code>allow_wallet</code></td><td>Its address, balance, holdings and trading mode.</td></tr>
+    <tr><td><code>allow_budget</code></td><td>Caps, what's used, what's left. It checks before spending.</td></tr>
+    <tr><td><code>allow_pay</code></td><td>Fetches a URL and pays its x402 price in USDC (no SOL needed, the seller pays the fee) or SOL.</td></tr>
+    <tr><td><code>allow_quote</code></td><td>Prices a buy or sell of any token on Jupiter. Nothing moves.</td></tr>
+    <tr><td><code>allow_swap</code></td><td>Executes the quote, under the floor it showed.</td></tr>
+    <tr><td><code>allow_token</code></td><td>$ALLOW on chain: supply, price, market cap, largest holders.</td></tr>
+    <tr><td><code>allow_history</code></td><td>The public registry: every payment and trade.</td></tr>
   </table></div>
 </div></section>
 
 <section><div class="wrap">
   <div class="label">The token</div>
-  <h2>$<span data-b="ticker">ALLOT</span></h2>
+  <h2>$<span data-b="ticker">ALLOW</span></h2>
   <p class="lead">Launched on pump.fun. The contract address is published here and on <a data-x href="#">X</a> at launch, nowhere else first.</p>
   <div class="cmd" style="margin-top:20px"><span class="label">CA</span><code id="ca">Drops at launch</code></div>
 </div></section>
@@ -180,7 +181,7 @@
   <h2 class="xl">Docs, registry and proof.</h2>
   <div class="links3">
     <a href="/docs"><h3>Documentation</h3><p>Install for Claude and ChatGPT, the CLI, the security model.</p><span>↗</span></a>
-    <a href="/dashboard"><h3>Wallet and registry</h3><p>The agent's address, its allotment and every action it took.</p><span>↗</span></a>
+    <a href="/dashboard"><h3>Wallet and registry</h3><p>The agent's address, its allowance and every action it took.</p><span>↗</span></a>
     <a href="/verify"><h3>Verify</h3><p>Recompute any entry and read its memo from a Solana RPC.</p><span>↗</span></a>
   </div>
 </div></section>
@@ -188,9 +189,9 @@
 <section><div class="wrap" style="max-width:820px">
   <div class="label">Questions</div>
   <h2>Before you hand it the keys.</h2>
-  <details class="faq"><summary>Can the agent raise its own budget?</summary><p>No. None of the seven tools writes the allotment. The owner controls answer only on this machine, never through a tunnel.</p></details>
+  <details class="faq"><summary>Can the agent raise its own budget?</summary><p>No. None of the seven tools writes the allowance. The owner controls answer only on this machine, never through a tunnel.</p></details>
   <details class="faq"><summary>Does the agent need SOL?</summary><p>Not to pay. x402 payments in USDC are signed by the agent and submitted by the seller, who pays the network fee. A few lamports of SOL are only needed to anchor the registry on chain and to trade.</p></details>
-  <details class="faq"><summary>Who holds the key?</summary><p>You do. It's a file in <code>~/.allot</code> on your machine. Allot runs no custody server and never sees it.</p></details>
+  <details class="faq"><summary>Who holds the key?</summary><p>You do. It's a file in <code>~/.allow</code> on your machine. Allow runs no custody server and never sees it.</p></details>
   <details class="faq"><summary>Does it really trade?</summary><p>Yes, through Jupiter on mainnet when you switch live mode on. Until then every swap fills at the live Jupiter quote into a paper wallet and is marked simulated in the registry.</p></details>
   <details class="faq"><summary>What stops a honeypot?</summary><p>Tokens whose creator can still freeze holders are refused. Thin liquidity, open mint and concentrated holders come back as warnings in the quote.</p></details>
   <details class="faq"><summary>How is the registry public?</summary><p>Each entry is hash-chained and signed by the agent. Batches are rolled into a Merkle root posted as an SPL Memo signed by the same wallet. /verify checks all of it against a Solana RPC from your browser.</p></details>
@@ -201,7 +202,7 @@
     <span class="fmark" data-logo></span>
     <h2 class="xl">Give your agent <span class="accent">a wallet.</span></h2>
     <p class="lead">One command, a budget you set, and a public receipt for everything it does.</p>
-    <div class="row"><a class="btn pill" href="/docs">Install Allot ↗</a><a class="btn ghost pill" href="/verify">Verify an entry</a></div>
+    <div class="row"><a class="btn pill" href="/docs">Install Allow ↗</a><a class="btn ghost pill" href="/verify">Verify an entry</a></div>
   </div>
   <div class="fr"><svg viewBox="0 0 88 88" class="glossy"><defs>
     <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD2B8"/><stop offset=".35" stop-color="#FF7A3D"/><stop offset=".75" stop-color="#E4420E"/><stop offset="1" stop-color="#8E2404"/></linearGradient>
@@ -211,7 +212,7 @@
 
 
 <footer><div class="wrap row" style="justify-content:space-between">
-  <span><span data-b="name">Allot</span> · <span data-b="domain">allot.fun</span> · MIT</span>
+  <span><span data-b="name">Allow</span> · <span data-b="domain">getallow.fun</span> · MIT</span>
   <span>Non-custodial. Your agent's key never leaves your machine.</span>
 </div></footer>
 <script type="module">
@@ -224,15 +225,15 @@ function say(e) {
   const d = e.data;
   if (e.kind === "swap") return d.side === "buy"
     ? `Bought ${amt(d.out, d.outDecimals)} $${esc(d.token)} for ${amt(d.in, d.inDecimals)} ${d.quote} ($${e.usd.toFixed(2)}). Floor held, route ${esc(d.route.join(" + "))}.`
-    : `Sold ${amt(d.in, d.inDecimals)} $${esc(d.token)} for ${amt(d.out, d.outDecimals)} ${d.quote}. Sells don't touch the allotment.`;
+    : `Sold ${amt(d.in, d.inDecimals)} $${esc(d.token)} for ${amt(d.out, d.outDecimals)} ${d.quote}. Sells don't touch the allowance.`;
   if (e.kind === "pay") return `Paid $${e.usd.toFixed(4)} in ${esc(d.asset ?? "SOL")} over x402 to ${esc(new URL(d.url).host)}${d.feePaidBy === "seller" ? ", fee paid by the seller" : ""}: ${esc(d.description)}.`;
-  if (e.kind === "policy.set") return `New allotment from my owner: $${d.perTxUsd} per action, $${d.dailyUsd} a day, $${d.totalUsd} in total.`;
+  if (e.kind === "policy.set") return `New allowance from my owner: $${d.perTxUsd} per action, $${d.dailyUsd} a day, $${d.totalUsd} in total.`;
   if (e.kind === "wallet.created") return `Wallet created on ${esc(d.cluster)}. The key stays on my owner's machine.`;
-  if (e.kind === "revoke") return "My owner revoked the allotment. I stop here.";
-  if (e.kind === "unrevoke") return "Allotment restored. Back to work, inside the caps.";
+  if (e.kind === "revoke") return "My owner revoked the allowance. I stop here.";
+  if (e.kind === "unrevoke") return "Allowance restored. Back to work, inside the caps.";
   return esc(e.kind);
 }
-const tag = (e) => ({ swap: e.data.side === "buy" ? "Buy" : "Sell", pay: "x402", revoke: "Revoke", "policy.set": "Allotment", "wallet.created": "Wallet" })[e.kind] ?? e.kind;
+const tag = (e) => ({ swap: e.data.side === "buy" ? "Buy" : "Sell", pay: "x402", revoke: "Revoke", "policy.set": "Allowance", "wallet.created": "Wallet" })[e.kind] ?? e.kind;
 // A tiny identicon from the address: two hues, a 3x3 mirrored grid.
 function ava(a) {
   let h = 0; for (const ch of a) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
@@ -252,7 +253,7 @@ function count(el, to, fmt) {
 }
 async function load() {
   const st = await (await fetch("/api/state")).json().catch(() => ({}));
-  if (!st.ready) { $("#chatFeed").innerHTML = `<div class="it"><p>No agent yet. Run <code>allot init</code>.</p></div>`; return; }
+  if (!st.ready) { $("#chatFeed").innerHTML = `<div class="it"><p>No agent yet. Run <code>allow init</code>.</p></div>`; return; }
   const name = esc(st.wallet.address);
   $("#talk").textContent = st.budget.revoked ? "Revoked" : st.live ? "Live" : "Simulated fills";
   $("#chatFeed").innerHTML = st.entries.slice(0, 12).map((e) => `<div class="it av"><i class="ava" style="${ava(st.wallet.address)}"></i><div><div class="ih"><b>agent ${short(st.wallet.address)}</b><span class="label">#${e.seq}</span><time>${ago(e.ts)}</time></div><p>${say(e)}</p></div></div>`).join("");

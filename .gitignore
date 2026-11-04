@@ -1,8 +1,10 @@
 node_modules
-.allot
+.allow
 *.log
 .env*
-.allot-test
+.allow-test
 web/downloads
-.allot-usdc
-.allot-sol
+.allow-usdc
+.allow-sol
+.allot*
+.allow*

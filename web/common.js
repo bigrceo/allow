@@ -15,7 +15,7 @@ const MENUS = {
   product: {
     rows: [
       ["wallet", "The wallet", "A Solana keypair on your machine, used through MCP.", "/docs"],
-      ["gauge", "The allotment", "Caps per action, per day and in total.", "/dashboard"],
+      ["gauge", "The allowance", "Caps per action, per day and in total.", "/dashboard"],
       ["send", "x402 payments", "USDC with the fee paid by the seller, or SOL.", "/docs"],
       ["swap", "Trading", "Any Solana token through Jupiter, floor re-checked.", "/docs"],
       ["list", "Registry", "Every action signed, chained and anchored.", "/dashboard"],
@@ -24,12 +24,12 @@ const MENUS = {
   },
   docs: {
     rows: [
-      ["book", "Install", "Wallet, allotment and funding in two minutes.", "/docs"],
+      ["book", "Install", "Wallet, allowance and funding in two minutes.", "/docs"],
       ["chat", "Claude and ChatGPT", "MCP for Claude Desktop, Claude Code and ChatGPT.", "/docs"],
       ["term", "CLI", "status, pay, buy, sell, history, revoke.", "/docs"],
       ["shield", "Security model", "What is enforced, and where.", "/docs"],
     ],
-    cards: [["/visuals/caps.svg", "Allotment", "Caps the model can read and never raise.", "/dashboard"], ["/visuals/x402.svg", "x402 in USDC", "Pay APIs with a wallet that holds no SOL.", "/docs"]],
+    cards: [["/visuals/caps.svg", "Allowance", "Caps the model can read and never raise.", "/dashboard"], ["/visuals/x402.svg", "x402 in USDC", "Pay APIs with a wallet that holds no SOL.", "/docs"]],
   },
 };
 const mega = (k) => `<div class="mega" data-menu="${k}"><div class="mega-in"><div class="mrows">${MENUS[k].rows.map(([i, t, d, h]) => `<a class="mrow" href="${h}"><span class="mico">${icon(i)}</span><span><b>${t}</b><small>${d}</small></span></a>`).join("")}</div><div class="mcards">${MENUS[k].cards.map(([img, t, d, h]) => `<a class="mcard" href="${h}"><span class="mimg"><img src="${img}" alt=""></span><span class="mtxt"><b>${t}</b><small>${d}</small><i>↗</i></span></a>`).join("")}</div></div></div>`;

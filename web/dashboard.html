@@ -8,7 +8,7 @@
 <body>
 <nav id="nav"><div class="wrap"></div></nav>
 <main class="wrap" style="padding:40px 16px 80px">
-  <div id="empty" hidden class="card"><h3>No agent wallet yet</h3><p>Run <code>allot init</code> on this machine, then reload.</p></div>
+  <div id="empty" hidden class="card"><h3>No agent wallet yet</h3><p>Run <code>allow init</code> on this machine, then reload.</p></div>
   <div id="app" hidden>
     <div class="row" style="justify-content:space-between">
       <div>
@@ -22,11 +22,11 @@
     <div class="grid" style="margin-top:28px">
       <div class="card"><div class="label">Balance</div><div class="big" id="sol">…</div><div class="label" id="cluster"></div></div>
       <div class="card"><div class="label">Left today</div><div class="big" id="left">…</div><div class="meter"><i id="dayBar"></i></div><div class="label" id="dayTxt"></div></div>
-      <div class="card"><div class="label">Total allotment</div><div class="big" id="total">…</div><div class="meter"><i id="totBar"></i></div><div class="label" id="totTxt"></div></div>
+      <div class="card"><div class="label">Total allowance</div><div class="big" id="total">…</div><div class="meter"><i id="totBar"></i></div><div class="label" id="totTxt"></div></div>
       <div class="card"><div class="label">Registry</div><div class="big" id="count">…</div><div class="label" id="anch"></div></div>
     </div>
 
-    <h3 style="margin:40px 0 12px">Allotment</h3>
+    <h3 style="margin:40px 0 12px">Allowance</h3>
     <form id="policy" class="card grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
       <label><div class="label">Per action, USD</div><input name="perTxUsd" type="number" step="any" min="0"></label>
       <label><div class="label">Per 24 h, USD</div><input name="dailyUsd" type="number" step="any" min="0"></label>
@@ -80,7 +80,7 @@ function describe(e) {
   const d = e.data;
   if (e.kind === "swap") return `${d.side === "buy" ? "Bought" : "Sold"} $${esc(d.token)} <span class="label">${esc(d.mode)}</span>`;
   if (e.kind === "pay") return `Paid ${esc(new URL(d.url).host)} · ${esc(d.description)}`;
-  return esc({ "wallet.created": "Wallet created", "policy.set": "Allotment set", revoke: "Revoked", unrevoke: "Restored" }[e.kind] ?? e.kind);
+  return esc({ "wallet.created": "Wallet created", "policy.set": "Allowance set", revoke: "Revoked", unrevoke: "Restored" }[e.kind] ?? e.kind);
 }
 const post = (p, b) => fetch(p, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(b) }).then((r) => r.json());
 $("#policy").onsubmit = async (ev) => {

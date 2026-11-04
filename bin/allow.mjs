@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// allot: the owner's side of the kit. Create the wallet, set the allotment, watch it, revoke it.
+// allow: the owner's side of the kit. Create the wallet, set the allowance, watch it, revoke it.
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { randomBytes } from "node:crypto";
@@ -14,27 +14,27 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const [cmd, ...args] = process.argv.slice(2);
 const flag = (f) => args.includes(f);
 const show = (o) => console.log(typeof o === "string" ? o : JSON.stringify(o, null, 2));
-const need = () => { const a = loadAgent(); if (!a) throw new Error("No wallet yet: run `allot init`."); return a; };
+const need = () => { const a = loadAgent(); if (!a) throw new Error("No wallet yet: run `allow init`."); return a; };
 
 const HELP = `${BRAND.name}. ${BRAND.tagline}
 
-  allot init                  create the agent wallet and its allotment (${HOME})
-  allot status                address, balance, allotment left
-  allot airdrop [sol]         localnet/devnet SOL to test with
-  allot usdc [amount]         localnet test USDC (pays x402 with zero SOL)
-  allot policy                show the allotment
-  allot policy <field> <v>    perTxUsd | dailyUsd | totalUsd | maxSlippageBps | payHosts | tokens | owner | expiresAt
-  allot pay <url>             pay an x402 endpoint
-  allot buy <token> <sol>     quote then swap (simulated unless mainnet + ALLOT_LIVE=1)
-  allot sell <token> <amt>
-  allot token                 $ALLOT on chain: supply, price, holders
-  allot history               the public registry
-  allot anchor                anchor pending entries on Solana now
-  allot revoke [--sweep]      stop the agent; --sweep sends the funds to the owner
-  allot unrevoke
-  allot mcp                   run the MCP server (stdio)
-  allot serve                 site, dashboard and /verify on :4340
-  allot config claude|chatgpt print the install snippet
+  allow init                  create the agent wallet and its allowance (${HOME})
+  allow status                address, balance, allowance left
+  allow airdrop [sol]         localnet/devnet SOL to test with
+  allow usdc [amount]         localnet test USDC (pays x402 with zero SOL)
+  allow policy                show the allowance
+  allow policy <field> <v>    perTxUsd | dailyUsd | totalUsd | maxSlippageBps | payHosts | tokens | owner | expiresAt
+  allow pay <url>             pay an x402 endpoint
+  allow buy <token> <sol>     quote then swap (simulated unless mainnet + ALLOW_LIVE=1)
+  allow sell <token> <amt>
+  allow token                 $ALLOW on chain: supply, price, holders
+  allow history               the public registry
+  allow anchor                anchor pending entries on Solana now
+  allow revoke [--sweep]      stop the agent; --sweep sends the funds to the owner
+  allow unrevoke
+  allow mcp                   run the MCP server (stdio)
+  allow serve                 site, dashboard and /verify on :4340
+  allow config claude|chatgpt print the install snippet
 
 cluster: ${CLUSTER} · trading: ${LIVE_TRADING ? "LIVE" : "simulated"}`;
 
@@ -46,7 +46,7 @@ async function main() {
       writeJson("server.json", { mcpKey: randomBytes(16).toString("hex") });
       await record(a, "wallet.created", { cluster: CLUSTER });
       await record(a, "policy.set", r.policy);
-      show({ address: r.address, cluster: CLUSTER, allotment: r.policy, next: CLUSTER === "mainnet" ? `Send SOL or USDC to ${r.address}` : "allot airdrop 1" });
+      show({ address: r.address, cluster: CLUSTER, allowance: r.policy, next: CLUSTER === "mainnet" ? `Send SOL or USDC to ${r.address}` : "allow airdrop 1" });
       break;
     }
     case "status": show({ ...(await core.wallet()), budget: await core.budget() }); break;
@@ -77,23 +77,23 @@ async function main() {
       const a = need();
       setPolicy({ revoked: true });
       const owner = getPolicy().owner;
-      const swept = flag("--sweep") ? (owner ? await sweep(a, owner) : "no owner set: `allot policy owner <address>`") : null;
+      const swept = flag("--sweep") ? (owner ? await sweep(a, owner) : "no owner set: `allow policy owner <address>`") : null;
       await record(a, "revoke", { sweptTo: flag("--sweep") ? owner : null, signature: typeof swept === "string" && swept.length > 60 ? swept : null });
       await anchor(a).catch(() => null);
       show({ revoked: true, swept });
       break;
     }
-    case "unrevoke": { const a = need(); setPolicy({ revoked: false }); await record(a, "unrevoke", {}); show("Allotment active again."); break; }
+    case "unrevoke": { const a = need(); setPolicy({ revoked: false }); await record(a, "unrevoke", {}); show("Allowance active again."); break; }
     case "mcp": await import("../mcp/server.mjs"); break;
     case "serve": await import("../server.mjs"); break;
     case "config": {
       const mcp = join(root, "mcp/server.mjs");
-      if (args[0] === "chatgpt") show(`ChatGPT → Settings → Connectors → Create. MCP server URL: <your https tunnel>/mcp/${readJson("server.json")?.mcpKey ?? "<run allot init>"}  (auth: none; the key in the path is the secret)`);
-      else show({ mcpServers: { allot: { command: "node", args: [mcp], env: { ALLOT_CLUSTER: CLUSTER } } } });
+      if (args[0] === "chatgpt") show(`ChatGPT → Settings → Connectors → Create. MCP server URL: <your https tunnel>/mcp/${readJson("server.json")?.mcpKey ?? "<run allow init>"}  (auth: none; the key in the path is the secret)`);
+      else show({ mcpServers: { allow: { command: "node", args: [mcp], env: { ALLOW_CLUSTER: CLUSTER } } } });
       break;
     }
     default: show(HELP);
   }
 }
 
-main().catch((e) => { console.error(`allot: ${e.message}`); process.exit(1); });
+main().catch((e) => { console.error(`allow: ${e.message}`); process.exit(1); });

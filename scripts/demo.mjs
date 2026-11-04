@@ -1,5 +1,5 @@
 // Live demo, one command: an agent pays an x402 API, buys a token, sells part of it, shows its registry.
-// Needs `allot serve` running and a funded wallet (localnet/devnet: `allot airdrop 1`).
+// Needs `allow serve` running and a funded wallet (localnet/devnet: `allow airdrop 1`).
 import { SITE_URL } from "../lib/config.mjs";
 import * as core from "../lib/core.mjs";
 

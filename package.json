@@ -1,10 +1,10 @@
 {
-  "name": "allot-kit",
+  "name": "allow-kit",
   "version": "0.1.0",
   "description": "Give your agent a wallet. Budgeted Solana wallet, x402 payments, real trades, public registry.",
   "type": "module",
   "bin": {
-    "allot": "bin/allot.mjs"
+    "allow": "bin/allow.mjs"
   },
   "scripts": {
     "dev": "node server.mjs",

@@ -8,8 +8,8 @@ test("MCP exposes the seven tools and answers budget", async () => {
   const client = new Client({ name: "test", version: "0" });
   await client.connect(new StdioClientTransport({ command: "node", args: ["mcp/server.mjs"], env: { ...process.env } }));
   const { tools } = await client.listTools();
-  assert.deepEqual(tools.map((t) => t.name).sort(), ["allot_budget", "allot_history", "allot_pay", "allot_quote", "allot_swap", "allot_token", "allot_wallet"]);
-  const r = await client.callTool({ name: "allot_budget", arguments: {} });
+  assert.deepEqual(tools.map((t) => t.name).sort(), ["allow_budget", "allow_history", "allow_pay", "allow_quote", "allow_swap", "allow_token", "allow_wallet"]);
+  const r = await client.callTool({ name: "allow_budget", arguments: {} });
   assert.match(r.content[0].text, /perActionUsd|No agent wallet/);
   await client.close();
 });

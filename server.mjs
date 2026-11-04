@@ -1,4 +1,4 @@
-// Allot local server on :4340: site, dashboard, /verify, public registry API, demo x402 endpoints, remote MCP.
+// Allow local server on :4340: site, dashboard, /verify, public registry API, demo x402 endpoints, remote MCP.
 import { createServer } from "node:http";
 import { readFileSync, existsSync } from "node:fs";
 import { extname, join, dirname } from "node:path";
@@ -72,7 +72,7 @@ async function paidEndpoint(req, res, url) {
 }
 
 async function mcpHttp(req, res) {
-  const server = new McpServer({ name: "allot", version: "0.1.0" });
+  const server = new McpServer({ name: "allow", version: "0.1.0" });
   registerTools(server);
   const t = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   res.on("close", () => { t.close(); server.close(); });
