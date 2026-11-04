@@ -1,5 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
-<defs><radialGradient id="o" cx=".3" cy=".25" r=".9"><stop offset="0" stop-color="#FFE0C9"/><stop offset=".35" stop-color="#FF7A3D"/><stop offset=".75" stop-color="#C83C0A"/><stop offset="1" stop-color="#3a1406"/></radialGradient>
-<radialGradient id="s" cx=".32" cy=".22" r=".35"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
-<rect width="400" height="400" fill="#0B0B0C"/><circle cx="200" cy="200" r="200" fill="url(#o)"/><circle cx="200" cy="200" r="200" fill="url(#s)"/>
-<g transform="translate(200 200) scale(2.3) translate(-44 -44)"><path fill="#FFFFFF" fill-rule="evenodd" d="M44 8a36 36 0 1 0 36 36H44V8Z M52 0v36h36A36 36 0 0 0 52 0Z"/></g></svg>
+<defs>
+<radialGradient id="core" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#1a0904"/><stop offset=".55" stop-color="#2a0f05"/><stop offset=".8" stop-color="#C83C0A"/><stop offset=".93" stop-color="#FF8A4C"/><stop offset="1" stop-color="#FFE0C9"/></radialGradient>
+<radialGradient id="hot" cx=".72" cy=".8" r=".5"><stop offset="0" stop-color="#FFB36B" stop-opacity=".9"/><stop offset="1" stop-color="#FF5A1F" stop-opacity="0"/></radialGradient>
+<radialGradient id="cool" cx=".25" cy=".2" r=".45"><stop offset="0" stop-color="#FF5A1F" stop-opacity=".55"/><stop offset="1" stop-color="#FF5A1F" stop-opacity="0"/></radialGradient></defs>
+<rect width="400" height="400" fill="#0B0B0C"/>
+<circle cx="200" cy="200" r="200" fill="url(#core)"/><circle cx="200" cy="200" r="200" fill="url(#hot)"/><circle cx="200" cy="200" r="200" fill="url(#cool)"/>
+<g transform="translate(196 204) scale(2.2) translate(-44 -44)"><path fill="#FFFFFF" fill-rule="evenodd" d="M44 8a36 36 0 1 0 36 36H44V8Z M52 0v36h36A36 36 0 0 0 52 0Z"/></g></svg>
