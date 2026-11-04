@@ -13,7 +13,7 @@
 
   <h3 style="margin-top:36px">1 · Create the wallet</h3>
   <p>Node 20 or newer. The kit installs straight from this site (<code>npx allow-kit</code> once it is on npm). The key is written to <code>~/.allow/agent.json</code> (mode 600). It never leaves your machine.</p>
-  <pre>npm i -g https://getallow.fun/downloads/allow-kit-0.1.0.tgz
+  <pre>npm i -g https://useallow.xyz/downloads/allow-kit-0.1.0.tgz
 allow init
 allow policy perTxUsd 10      # cap per action
 allow policy dailyUsd 50      # cap per 24 h
@@ -24,13 +24,13 @@ allow policy owner &lt;your wallet&gt;   # where revoke --sweep sends funds</pre
   <p>Settings → Developer → Edit Config, then add:</p>
   <pre>{
   "mcpServers": {
-    "allow": { "command": "npx", "args": ["-y", "https://getallow.fun/downloads/allow-kit-0.1.0.tgz", "mcp"] }
+    "allow": { "command": "npx", "args": ["-y", "https://useallow.xyz/downloads/allow-kit-0.1.0.tgz", "mcp"] }
   }
 }</pre>
   <p>Restart Claude. Ask: <i>"What's my Allow budget?"</i></p>
 
   <h3 style="margin-top:36px"><i class="li" style="--m:url(/logos/claude.svg);color:#D97757;vertical-align:-4px"></i> Claude Code</h3>
-  <pre>claude mcp add allow -- npx -y https://getallow.fun/downloads/allow-kit-0.1.0.tgz mcp</pre>
+  <pre>claude mcp add allow -- npx -y https://useallow.xyz/downloads/allow-kit-0.1.0.tgz mcp</pre>
 
   <h3 style="margin-top:36px"><i class="li" style="--m:url(/logos/openai.svg);vertical-align:-4px"></i> ChatGPT</h3>
   <p>ChatGPT talks to remote MCP servers over HTTPS. Run the server and expose it with a tunnel:</p>

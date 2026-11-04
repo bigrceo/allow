@@ -2,7 +2,7 @@
 
 ## 1. Wallet
 ```bash
-npm i -g https://getallow.fun/downloads/allow-kit-0.1.0.tgz && allow init
+npm i -g https://useallow.xyz/downloads/allow-kit-0.1.0.tgz && allow init
 allow policy perTxUsd 10
 allow policy dailyUsd 50
 allow policy owner <your wallet>     # for revoke --sweep
@@ -12,13 +12,13 @@ Fund the printed address with USDC (enough for x402: the seller pays the fee) pl
 ## 2. Claude Desktop
 Settings → Developer → Edit Config:
 ```json
-{ "mcpServers": { "allow": { "command": "npx", "args": ["-y", "https://getallow.fun/downloads/allow-kit-0.1.0.tgz", "mcp"] } } }
+{ "mcpServers": { "allow": { "command": "npx", "args": ["-y", "https://useallow.xyz/downloads/allow-kit-0.1.0.tgz", "mcp"] } } }
 ```
 From a clone: `"command": "node", "args": ["/path/to/agentkit/mcp/server.mjs"]`. `allow config claude` prints it.
 
 ## 3. Claude Code
 ```bash
-claude mcp add allow -- npx -y https://getallow.fun/downloads/allow-kit-0.1.0.tgz mcp
+claude mcp add allow -- npx -y https://useallow.xyz/downloads/allow-kit-0.1.0.tgz mcp
 ```
 
 ## 4. ChatGPT

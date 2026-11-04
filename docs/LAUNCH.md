@@ -4,12 +4,12 @@
 **Line** Your agent can trade. It can't touch more than you allow. Nobody can.
 **Meta** Agent tools (Rialto, Volition, Rise) + sealed / untouchable launches (Nullary): Allow is the sealed wallet for agents.
 
-**Name** Allow · **Ticker** $ALLOW (free on Solana per DexScreener, 04/11/2026; a $9K one exists on Polygon) · **Domain** getallow.fun (free, whois Radix; allow.fun is taken) · **X** @getallow (to check by hand) · **npm** allow-kit (`allow` is taken)
+**Name** Allow · **Ticker** $ALLOW (free on Solana per DexScreener, 04/11/2026; a $9K one exists on Polygon) · **Domain** useallow.xyz (free, whois Radix; allow.fun is taken) · **X** @useallow (to check by hand) · **npm** allow-kit (`allow` is taken)
 **Logo** `web/logo.svg`: a disc with its quarter set aside, one color #FF5A1F, no stroke.
 
 ## pump.fun
 - Name: Allow · Ticker: ALLOW
-- Description: Give your agent a wallet. Claude or ChatGPT gets a Solana wallet with a budget it can't break: pays APIs over x402, trades any token through Jupiter, every action in a public registry anchored on Solana. getallow.fun
+- Description: Give your agent a wallet. Claude or ChatGPT gets a Solana wallet with a budget it can't break: pays APIs over x402, trades any token through Jupiter, every action in a public registry anchored on Solana. useallow.xyz
 - Image: `web/logo.svg` on #0B0B0C (export 1000×1000)
 
 ## X profile

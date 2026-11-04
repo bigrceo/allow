@@ -3,9 +3,9 @@
 **Give your agent a wallet.** Claude, ChatGPT or any MCP client gets a Solana wallet with an allowance. It pays APIs over x402, trades any Solana token through Jupiter, and every action lands in a public registry anchored on Solana.
 
 ```bash
-npm i -g https://getallow.fun/downloads/allow-kit-0.1.0.tgz && allow init          # wallet + allowance in ~/.allow
+npm i -g https://useallow.xyz/downloads/allow-kit-0.1.0.tgz && allow init          # wallet + allowance in ~/.allow
 allow serve         # site, dashboard, /verify on :4340
-claude mcp add allow -- npx -y https://getallow.fun/downloads/allow-kit-0.1.0.tgz mcp
+claude mcp add allow -- npx -y https://useallow.xyz/downloads/allow-kit-0.1.0.tgz mcp
 ```
 
 | Part | Where |

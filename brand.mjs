@@ -2,8 +2,8 @@
 export const BRAND = {
   name: "Allow",
   ticker: "ALLOW",
-  domain: "getallow.fun",
-  x: "getallow",
+  domain: "useallow.xyz",
+  x: "useallow",
   ca: "", // paste the pump.fun mint here at launch: nav, site and token section pick it up
   version: "0.1.0",
   tagline: "Give your agent a wallet.",
