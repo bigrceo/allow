@@ -1,0 +1,5 @@
+node_modules
+.allot
+*.log
+.env*
+.allot-test

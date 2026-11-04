@@ -1,0 +1,27 @@
+{
+  "name": "allot-kit",
+  "version": "0.1.0",
+  "description": "Give your agent a wallet. Budgeted Solana wallet, x402 payments, real trades, public registry.",
+  "type": "module",
+  "bin": {
+    "allot": "bin/allot.mjs"
+  },
+  "scripts": {
+    "dev": "node server.mjs",
+    "mcp": "node mcp/server.mjs",
+    "test": "node --test test/merkle.test.mjs test/mcp.test.mjs",
+    "demo": "node scripts/demo.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@solana/spl-token": "^0.4.15",
+    "@solana/web3.js": "^1.99.0",
+    "bs58": "^6.0.0",
+    "tweetnacl": "^1.0.3",
+    "zod": "^3.25.76"
+  }
+}

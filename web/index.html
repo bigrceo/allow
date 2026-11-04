@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{name}: {tagline}</title>
+<meta name="description" content="A Solana wallet for your AI agent, with a budget it can't break: x402 payments, real trades through Jupiter, and a public registry anchored on chain.">
+<link rel="icon" href="/logo.svg"><link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav><div class="wrap"></div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="label">Agent wallets on Solana</div>
+  <h1 data-b="tagline">Give your agent a wallet.</h1>
+  <p class="lead">Claude, ChatGPT or any MCP client gets its own Solana wallet and an allotment. It pays APIs over x402, trades any token through Jupiter, and writes every action to a public registry anchored on chain. Over budget, it stops. Revoked, it stops.</p>
+  <div class="row" style="margin-top:28px">
+    <div class="cmd"><code>npx allot-kit init</code><button data-copy="npx allot-kit init">Copy</button></div>
+    <a class="btn" href="/docs">Install</a>
+    <a class="btn ghost" href="/dashboard">Dashboard</a>
+  </div>
+  <div class="works">
+    <span class="label">Works with</span>
+    <span><i class="li" style="--m:url(/logos/claude.svg);color:#D97757"></i>Claude</span>
+    <span><i class="li" style="--m:url(/logos/openai.svg)"></i>ChatGPT</span>
+    <span><i class="li" style="--m:url(/logos/solana.svg);background:linear-gradient(90deg,#9945FF,#14F195)"></i>Solana</span>
+    <span><img src="/logos/jupiter.svg" alt="">Jupiter</span>
+  </div>
+</div></header>
+
+<section><div class="wrap split">
+  <div>
+    <div class="label">The difference</div>
+    <h2>Other kits let the agent pay. <span class="accent">This one lets it trade.</span></h2>
+    <p class="lead">Ask for a trade in plain words. The agent resolves the token, refuses honeypots, prices it on Jupiter, checks your caps and executes. No click per trade inside the allotment, no key leaving your machine, and a public line in the registry for every swap.</p>
+  </div>
+  <div class="chat" id="demo">
+    <div class="msg u">Put $5 into BONK, then show me the receipt.</div>
+    <div class="tool"><b>allot_budget</b> · $25 per action, $100 left today</div>
+    <div class="tool"><b>allot_quote</b> · buy BONK with 0.05 SOL · route Meteora · impact 0.01%</div>
+    <div class="tool"><b>allot_swap</b> · filled · registry #4 · anchored on Solana</div>
+    <div class="msg a">Bought 1,552,800 BONK for 0.05 SOL ($4.76). It's entry #4 in the public registry, anchored in a memo signed by my wallet. You have $95.24 left today.</div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="label">How it works</div>
+  <h2>Four parts, one wallet.</h2>
+  <div class="grid" style="margin-top:28px">
+    <div class="card"><div class="label accent">01 · Allotment</div><h3>Caps the agent can't raise</h3><p>Per action, per 24 hours, in total, plus an expiry, a token list and a pay list. Set by you from the CLI or the dashboard. No MCP tool can touch it.</p></div>
+    <div class="card"><div class="label accent">02 · Pay</div><h3>x402, natively</h3><p>An endpoint answers 402 with a price. The agent signs a transfer for exactly that amount, the seller settles it, the answer comes back. Hosts you didn't allow are refused.</p></div>
+    <div class="card"><div class="label accent">03 · Trade</div><h3>Any Solana token</h3><p>Ticker, name or mint. Freeze authority on means refused. It re-prices before signing and aborts if the market moved past the floor it showed.</p></div>
+    <div class="card"><div class="label accent">04 · Registry</div><h3>Public and checkable</h3><p>Every action is hash-chained, signed by the agent key and rolled into a Merkle root posted in an SPL Memo. Anyone can check an entry on <a href="/verify">/verify</a>.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="label">Tools your agent gets</div>
+  <h2>Six tools. That's the kit.</h2>
+  <div class="scroll"><table style="margin-top:20px">
+    <tr><th class="label">Tool</th><th class="label">What it does</th></tr>
+    <tr><td><code>allot_wallet</code></td><td>Its address, balance, holdings and trading mode.</td></tr>
+    <tr><td><code>allot_budget</code></td><td>Caps, what's used, what's left. It checks before spending.</td></tr>
+    <tr><td><code>allot_pay</code></td><td>Fetches a URL and pays its x402 price from the wallet.</td></tr>
+    <tr><td><code>allot_quote</code></td><td>Prices a buy or sell of any token on Jupiter. Nothing moves.</td></tr>
+    <tr><td><code>allot_swap</code></td><td>Executes the quote, under the floor it showed.</td></tr>
+    <tr><td><code>allot_history</code></td><td>The public registry: every payment and trade.</td></tr>
+  </table></div>
+</div></section>
+
+<section><div class="wrap split">
+  <div>
+    <div class="label">Kill switch</div>
+    <h2>Revoke in one command.</h2>
+    <p class="lead">The next tool call fails, whatever the agent was doing. Add <code>--sweep</code> and the balance goes back to your own wallet. The revocation is itself an entry in the registry.</p>
+  </div>
+  <pre>$ allot revoke --sweep
+{ "revoked": true, "swept": "4xQ…9Lm" }
+
+agent → allot_swap
+Error: This allotment was revoked by its owner.
+Nothing was done.</pre>
+</div></section>
+
+<section><div class="wrap">
+  <div class="label">The token</div>
+  <h2>$<span data-b="ticker">ALLOT</span></h2>
+  <p class="lead">Launched on pump.fun. The contract address is published here and on <a data-x href="#">X</a> at launch, nowhere else first.</p>
+  <div class="cmd" style="margin-top:20px"><span class="label">CA</span><code id="ca">Drops at launch</code></div>
+</div></section>
+
+<footer><div class="wrap row" style="justify-content:space-between">
+  <span><span data-b="name">Allot</span> · <span data-b="domain">allot.fun</span> · MIT</span>
+  <span>Non-custodial. Your agent's key never leaves your machine.</span>
+</div></footer>
+<script type="module" src="/common.js"></script>
+</body>
+</html>

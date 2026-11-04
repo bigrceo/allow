@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · {name}</title>
+<link rel="icon" href="/logo.svg"><link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav><div class="wrap"></div></nav>
+<main class="wrap" style="padding:40px 16px 80px">
+  <div id="empty" hidden class="card"><h3>No agent wallet yet</h3><p>Run <code>npx allot-kit init</code> on this machine, then reload.</p></div>
+  <div id="app" hidden>
+    <div class="row" style="justify-content:space-between">
+      <div>
+        <div class="label" id="mode"></div>
+        <h2 style="margin:6px 0" id="name">Your agent</h2>
+        <div class="mono addr" id="addr"></div>
+      </div>
+      <button class="btn danger" id="revoke">Revoke</button>
+    </div>
+
+    <div class="grid" style="margin-top:28px">
+      <div class="card"><div class="label">Balance</div><div class="big" id="sol">…</div><div class="label" id="cluster"></div></div>
+      <div class="card"><div class="label">Left today</div><div class="big" id="left">…</div><div class="meter"><i id="dayBar"></i></div><div class="label" id="dayTxt"></div></div>
+      <div class="card"><div class="label">Total allotment</div><div class="big" id="total">…</div><div class="meter"><i id="totBar"></i></div><div class="label" id="totTxt"></div></div>
+      <div class="card"><div class="label">Registry</div><div class="big" id="count">…</div><div class="label" id="anch"></div></div>
+    </div>
+
+    <h3 style="margin:40px 0 12px">Allotment</h3>
+    <form id="policy" class="card grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+      <label><div class="label">Per action, USD</div><input name="perTxUsd" type="number" step="any" min="0"></label>
+      <label><div class="label">Per 24 h, USD</div><input name="dailyUsd" type="number" step="any" min="0"></label>
+      <label><div class="label">Total, USD</div><input name="totalUsd" type="number" step="any" min="0"></label>
+      <label><div class="label">Max slippage, bps</div><input name="maxSlippageBps" type="number" min="10" max="3000"></label>
+      <label style="grid-column:1/-1"><div class="label">Hosts it may pay</div><input name="payHosts"></label>
+      <label style="grid-column:1/-1"><div class="label">Owner wallet (for sweep)</div><input name="owner" placeholder="your Solana address"></label>
+      <div class="row"><button class="btn" type="submit">Save</button><span class="label" id="saved"></span></div>
+    </form>
+
+    <h3 style="margin:40px 0 12px">Holdings</h3>
+    <div class="card scroll"><table id="hold"></table></div>
+
+    <h3 style="margin:40px 0 12px">Registry</h3>
+    <div class="card scroll"><table id="log"></table></div>
+  </div>
+</main>
+<script type="module">
+import { $, esc, short } from "/common.js";
+const fmt = (n) => `$${(+n).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+let st;
+async function load() {
+  st = await (await fetch("/api/state")).json();
+  if (!st.ready) { $("#empty").hidden = false; return; }
+  $("#app").hidden = false;
+  const { wallet: w, budget: b } = st;
+  $("#mode").textContent = b.revoked ? "Revoked" : st.live ? "Live trading" : "Simulated trading at live prices";
+  $("#mode").style.color = b.revoked ? "var(--bad)" : "";
+  $("#addr").textContent = w.address;
+  $("#sol").textContent = w.sol == null ? "?" : `${(+w.sol).toFixed(4)} SOL`;
+  $("#cluster").textContent = st.cluster;
+  $("#left").textContent = fmt(b.leftTodayUsd);
+  $("#dayBar").style.width = `${Math.min(100, (b.usedTodayUsd / b.dailyUsd) * 100)}%`;
+  $("#dayTxt").textContent = `${fmt(b.usedTodayUsd)} of ${fmt(b.dailyUsd)} used`;
+  $("#total").textContent = fmt(b.totalUsd - b.usedTotalUsd);
+  $("#totBar").style.width = `${Math.min(100, (b.usedTotalUsd / b.totalUsd) * 100)}%`;
+  $("#totTxt").textContent = `${fmt(b.usedTotalUsd)} of ${fmt(b.totalUsd)} used`;
+  $("#count").textContent = `${st.entries.length ? st.entries[0].seq + 1 : 0} entries`;
+  $("#anch").textContent = st.anchors.length ? `Anchored up to #${st.anchors[0].to}` : "Not anchored yet";
+  $("#revoke").textContent = b.revoked ? "Restore" : "Revoke";
+  const f = $("#policy");
+  if (!f.contains(document.activeElement)) {
+  f.perTxUsd.value = b.perActionUsd; f.dailyUsd.value = b.dailyUsd; f.totalUsd.value = b.totalUsd;
+  f.maxSlippageBps.value = Math.round(b.maxSlippagePct * 100); f.payHosts.value = b.payHosts.join(", ");
+  }
+  const h = w.paperHoldings ?? [];
+  $("#hold").innerHTML = `<tr><th class="label">Token</th><th class="label">Amount</th><th class="label">Mint</th></tr>` + (h.length ? h.map((x) => `<tr><td>$${esc(x.symbol)}</td><td>${(+x.amount).toLocaleString("en-US")}</td><td class="mono">${short(x.mint)}</td></tr>`).join("") : `<tr><td colspan="3">Nothing yet.</td></tr>`);
+  $("#log").innerHTML = `<tr><th class="label">#</th><th class="label">When</th><th class="label">Action</th><th class="label">USD</th><th class="label">Proof</th></tr>` + st.entries.map((e) => `<tr><td>${e.seq}</td><td>${new Date(e.ts).toLocaleString()}</td><td>${describe(e)}</td><td>${e.usd ? fmt(e.usd) : ""}</td><td><a href="/verify?seq=${e.seq}">Verify</a></td></tr>`).join("");
+}
+function describe(e) {
+  const d = e.data;
+  if (e.kind === "swap") return `${d.side === "buy" ? "Bought" : "Sold"} $${esc(d.token)} <span class="label">${esc(d.mode)}</span>`;
+  if (e.kind === "pay") return `Paid ${esc(new URL(d.url).host)} · ${esc(d.description)}`;
+  return esc({ "wallet.created": "Wallet created", "policy.set": "Allotment set", revoke: "Revoked", unrevoke: "Restored" }[e.kind] ?? e.kind);
+}
+const post = (p, b) => fetch(p, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(b) }).then((r) => r.json());
+$("#policy").onsubmit = async (ev) => {
+  ev.preventDefault();
+  const f = ev.target, b = { perTxUsd: f.perTxUsd.value, dailyUsd: f.dailyUsd.value, totalUsd: f.totalUsd.value, maxSlippageBps: f.maxSlippageBps.value, payHosts: f.payHosts.value };
+  if (f.owner.value) b.owner = f.owner.value;
+  const r = await post("/api/owner/policy", b);
+  $("#saved").textContent = r.error ? r.error : "Saved and written to the registry";
+  load();
+};
+$("#revoke").onclick = async () => { await post("/api/owner/revoke", { revoked: !st.budget.revoked }); load(); };
+load(); setInterval(load, 5000);
+</script>
+</body>
+</html>

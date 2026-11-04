@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verify · {name}</title>
+<link rel="icon" href="/logo.svg"><link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav><div class="wrap"></div></nav>
+<main class="wrap" style="padding:40px 16px 80px;max-width:820px">
+  <div class="label">Public registry</div>
+  <h2>Check an agent's action yourself.</h2>
+  <p class="lead">Your browser recomputes the entry hash, checks the agent's signature, walks the Merkle path to the root, then reads the memo straight from a Solana RPC. Nothing here trusts this server.</p>
+  <div class="row" style="margin:24px 0 12px">
+    <input id="seq" placeholder="Entry number, e.g. 4" style="max-width:220px" inputmode="numeric">
+    <button class="btn" id="go">Verify</button>
+  </div>
+  <details style="margin-bottom:24px"><summary class="label" style="cursor:pointer">Or paste a proof (JSON)</summary><textarea id="paste" style="margin-top:10px"></textarea><button class="btn ghost" id="go2" style="margin-top:10px">Verify pasted proof</button></details>
+  <div id="out"></div>
+</main>
+<script type="module">
+import { $, esc } from "/common.js";
+import { entryHash, leafOf, rootFromPath, memoFor, MEMO_RE } from "/lib/merkle.mjs";
+import { decode } from "/vendor/bs58.js";
+await import("/vendor/nacl.js");
+const nacl = window.nacl;
+const RPC = { devnet: "https://api.devnet.solana.com", mainnet: "https://api.mainnet-beta.solana.com", localnet: "http://127.0.0.1:8899" };
+
+async function run(p) {
+  const rows = [];
+  const add = (ok, t, d = "") => rows.push(`<div class="check"><span class="dot ${ok ? "yes" : "no"}">${ok ? "✓" : "✗"}</span><div><b>${t}</b><div class="label" style="text-transform:none;letter-spacing:0;font-weight:400">${d}</div></div></div>`);
+  const e = p.entry;
+  const h = await entryHash(e);
+  add(h === e.hash, "Entry hash", `sha256 of the canonical entry = ${h.slice(0, 16)}…`);
+  let sigOk = false;
+  try { sigOk = nacl.sign.detached.verify(Uint8Array.from(e.hash.match(/../g).map((x) => parseInt(x, 16))), decode(e.sig), decode(e.agent)); } catch {}
+  add(sigOk, "Signed by the agent wallet", e.agent);
+  if (!p.anchored) { add(false, "Anchored on Solana", "Not anchored yet. It will be in the next memo."); return show(rows, e); }
+  const root = await rootFromPath(await leafOf(e.hash), p.path);
+  add(root === p.root, "Merkle path leads to the root", `${p.path.length} steps → ${root.slice(0, 16)}…`);
+  const memo = memoFor(p.agent, p.from, p.to, p.root);
+  add(memo === p.memo && e.seq >= p.from && e.seq <= p.to, "Memo text matches", esc(memo));
+  try {
+    const r = await fetch(RPC[p.cluster] ?? RPC.devnet, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getTransaction", params: [p.signature, { encoding: "jsonParsed", maxSupportedTransactionVersion: 0, commitment: "confirmed" }] }) }).then((r) => r.json());
+    const tx = r.result;
+    const memos = (tx?.transaction.message.instructions ?? []).filter((i) => i.program === "spl-memo").map((i) => i.parsed);
+    const signer = tx?.transaction.message.accountKeys.find((k) => k.signer)?.pubkey;
+    add(memos.includes(memo) && signer === p.agent, "Memo is on Solana, signed by the agent", `${p.cluster} · tx ${p.signature.slice(0, 20)}…`);
+  } catch (err) { add(false, "Memo is on Solana", `Could not reach the ${p.cluster} RPC from this browser.`); }
+  show(rows, e);
+}
+function show(rows, e) {
+  const all = rows.every((r) => r.includes("yes"));
+  $("#out").innerHTML = `<div class="card"><div class="label ${all ? "yes" : "no"}">${all ? "Verified" : "Not fully verified"}</div><h3 style="margin-top:6px">Entry #${e.seq} · ${esc(e.kind)}</h3>${rows.join("")}<pre style="margin-top:16px">${esc(JSON.stringify(e.data, null, 2))}</pre></div>`;
+}
+async function bySeq(seq) {
+  const r = await fetch(`/api/proof/${encodeURIComponent(seq)}`);
+  if (!r.ok) { $("#out").innerHTML = `<div class="card">No entry #${esc(seq)}.</div>`; return; }
+  run(await r.json());
+}
+$("#go").onclick = () => bySeq($("#seq").value.trim());
+$("#seq").onkeydown = (ev) => ev.key === "Enter" && $("#go").click();
+$("#go2").onclick = () => { try { run(JSON.parse($("#paste").value)); } catch { $("#out").innerHTML = `<div class="card">That isn't valid JSON.</div>`; } };
+const q = new URLSearchParams(location.search).get("seq");
+if (q) { $("#seq").value = q; bySeq(q); }
+</script>
+</body>
+</html>
