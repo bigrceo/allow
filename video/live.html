@@ -154,7 +154,7 @@ const S = [
     const s1 = slam(t, 25.1), k = ease(prog(t, 25.8, 26.4)), g = .6 + .4 * Math.sin(t * 4);
     return `<div style="position:absolute;left:50%;top:150px;width:150px;margin-left:-75px;opacity:${k};filter:drop-shadow(0 0 ${20 + 20 * g}px rgba(255,90,31,.9))">${mark()}</div>
       <div class="line huge" style="top:340px;opacity:${s1.o};transform:scale(${s1.s}) translateX(${s1.shake}px)"><span class="acc">$ALLOW</span> is live</div>
-      <div class="line" style="top:560px;opacity:${ease(prog(t, 26.0, 26.6))}">${CA ? `<span class="ca">${CA}</span>` : `<span class="ca">CA in bio</span>`}</div>
+      <div class="line" style="top:560px;opacity:${ease(prog(t, 26.0, 26.6))}">${CA ? `<span class="ca">${CA}</span>` : ""}</div>
       <div class="line" style="top:720px;font-size:44px">${words("Give your agent a wallet. Sealed by your rules.", t, 26.6, .08, [5, 6, 7, 8])}</div>
       <div class="line small" style="top:840px;opacity:${ease(prog(t, 27.6, 28.2))}">useallow.xyz</div>`;
   }],
