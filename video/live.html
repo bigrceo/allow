@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  /* Allow launch video, 1920x1080, 26 s, silent. Pure function of t: render(t). CA comes from ?ca=. */
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; font-family: Inter, sans-serif; color: #F6F4EF; }
+  #bg, #stage { position: absolute; inset: 0; }
+  #stage { perspective: 2200px; }
+  .line { position: absolute; left: 0; right: 0; text-align: center; font-weight: 500; font-size: 64px; letter-spacing: -.035em; }
+  .huge { font-size: 150px; font-weight: 800; letter-spacing: -.06em; line-height: .95; }
+  .w { display: inline-block; margin: 0 .12em; }
+  .acc { color: #FF7A3D; }
+  .small { font-size: 22px; font-weight: 600; letter-spacing: .32em; text-transform: uppercase; color: #cdbfb2; }
+  .vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(75% 75% at 50% 50%, transparent 55%, rgba(0,0,0,.8)); }
+  .panel { position: absolute; border-radius: 20px; background: #121011; box-shadow: 0 0 0 1px rgba(255,190,150,.16), 0 50px 140px -30px rgba(255,90,31,.45); overflow: hidden; }
+  .chead { height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 26px; border-bottom: 1px solid rgba(255,255,255,.07); font-weight: 600; font-size: 20px; }
+  .mcp { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: #cbbfb4; }
+  .mcp::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #3ccf7a; box-shadow: 0 0 10px #3ccf7a; }
+  .cbody { padding: 30px 40px; display: flex; flex-direction: column; gap: 16px; }
+  .ub { align-self: flex-end; max-width: 75%; padding: 16px 24px; border-radius: 18px; background: #2a2523; font-size: 28px; }
+  .tool { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-radius: 14px; box-shadow: inset 0 0 0 1px rgba(255,190,150,.2); background: rgba(255,90,31,.05); font-size: 22px; }
+  .tool svg.mk { width: 28px; height: 28px; flex: none; }
+  .tool code { font-family: "JetBrains Mono", monospace; font-size: 21px; color: #FFB36B; }
+  .tool .res { margin-left: auto; color: #e2d8cd; }
+  .ok { color: #3ccf7a; margin-left: 10px; }
+  .ab { font-size: 28px; line-height: 1.45; color: #ece6dd; }
+  .ab b { color: #FF7A3D; font-weight: 600; }
+  .stamp { position: absolute; left: 50%; top: 50%; padding: 18px 40px; border-radius: 14px; border: 6px solid #FF5A1F; color: #FF5A1F; font-weight: 800; font-size: 96px; letter-spacing: .02em; text-transform: uppercase; background: rgba(20,6,2,.82); box-shadow: 0 0 80px rgba(255,90,31,.55); }
+  .tok { display: flex; align-items: center; gap: 22px; padding: 26px 30px; }
+  .tok .ic { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 34px; color: #1a0702; }
+  .kv { display: grid; grid-template-columns: 1fr auto; gap: 14px 40px; padding: 0 30px 30px; font-size: 26px; color: #cfc6bb; }
+  .kv b { color: #F6F4EF; font-weight: 600; text-align: right; } .kv .bad { color: #ff6a4a; }
+  .term pre { padding: 34px 40px; font: 30px/1.75 "JetBrains Mono", monospace; white-space: pre-wrap; }
+  .c b { color: #FF5A1F; font-weight: 500; } .e { color: #ff7a5a; } .o { color: #9fd8a8; }
+  .caret { display: inline-block; width: 15px; height: 32px; background: #FF5A1F; vertical-align: -5px; }
+  .row { display: flex; align-items: center; gap: 18px; padding: 18px 28px; border-top: 1px solid rgba(255,255,255,.06); font-size: 24px; }
+  .row .k { color: #a89d92; width: 70px; } .row .tag { width: 120px; font-weight: 600; font-size: 16px; letter-spacing: .14em; color: #FFB36B; }
+  .row .anc { margin-left: auto; font-size: 18px; color: #3ccf7a; letter-spacing: .08em; }
+  .logos { display: flex; gap: 70px; justify-content: center; align-items: center; }
+  .logos div { display: flex; align-items: center; gap: 16px; font-size: 34px; font-weight: 600; }
+  .ca { display: inline-block; padding: 18px 34px; border-radius: 16px; box-shadow: inset 0 0 0 2px rgba(255,90,31,.6), 0 0 60px rgba(255,90,31,.3); font: 500 40px "JetBrains Mono", monospace; color: #FFE0C9; }
+</style>
+</head>
+<body>
+<canvas id="bg" width="1920" height="1080"></canvas>
+<div id="stage"></div>
+<div class="vig"></div>
+<script>
+const CA = new URLSearchParams(location.search).get("ca") || "";
+const P = "M44 8a36 36 0 1 0 36 36H44V8Z M52 0v36h36A36 36 0 0 0 52 0Z";
+const CLAUDE = "M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z";
+const OPENAI = "M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z";
+const bg = document.getElementById("bg").getContext("2d"), stage = document.getElementById("stage");
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 4);
+const inout = (x) => { x = clamp(x); return x < .5 ? 8 * x ** 4 : 1 - Math.pow(-2 * x + 2, 4) / 2; };
+const back = (x) => { x = clamp(x); const c = 2.2; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const env = (t, a, b, fi = .35, fo = .4) => Math.min(ease(prog(t, a, a + fi)), 1 - ease(prog(t, b - fo, b)));
+const mark = (c = "#FF5A1F", cls = "") => `<svg class="${cls}" viewBox="0 0 88 88"><path d="${P}" fill="${c}" fill-rule="evenodd"/></svg>`;
+const words = (text, t, start, step = .1, accent = []) => text.split(" ").map((w, i) => { const k = ease(prog(t, start + i * step, start + i * step + .55)); return `<span class="w ${accent.includes(i) ? "acc" : ""}" style="opacity:${k};filter:blur(${(1 - k) * 12}px);transform:translateY(${(1 - k) * 24}px) scale(${.9 + .1 * k})">${w}</span>`; }).join("");
+const slam = (t, at) => { const k = prog(t, at, at + .35); return { s: 1.9 - .9 * back(k), o: ease(k * 2), shake: k < 1 && k > .5 ? Math.sin(t * 90) * 6 * (1 - k) : 0 }; };
+const typed = (s, t, a, cps = 30) => s.slice(0, Math.max(0, Math.floor((t - a) * cps)));
+// Background: brand light bars, breathing; deterministic in t.
+const bars = [...Array(130)].map((_, i) => ({ x: i / 130, ph: (i * 2.399) % 6.28, sp: .3 + (i * .37 % 1) * .5, w: 5 + (i * 7 % 9) }));
+function drawBg(t, power) {
+  bg.clearRect(0, 0, 1920, 1080); bg.globalCompositeOperation = "lighter";
+  for (const b of bars) {
+    const f = (Math.exp(-((b.x - .5 - .06 * Math.sin(t * .4)) ** 2) / .02) * .9 + .35 * Math.exp(-((b.x - .12) ** 2) / .004) + .35 * Math.exp(-((b.x - .88) ** 2) / .004)) * (.6 + .4 * Math.sin(t * b.sp * 2 + b.ph)) * power;
+    if (f < .02) continue;
+    const x = b.x * 1920, top = 1080 * (.25 + .4 * (1 - f));
+    const g = bg.createLinearGradient(0, top, 0, 1080);
+    g.addColorStop(0, "rgba(255,110,40,0)"); g.addColorStop(.5, `rgba(255,${150 + 80 * f},${90 + 100 * f},${.45 * f})`); g.addColorStop(1, `rgba(255,90,31,${.6 * f})`);
+    bg.fillStyle = g; bg.fillRect(x - b.w / 2, top, b.w, 1080 - top);
+  }
+  bg.globalCompositeOperation = "source-over";
+}
+const chat = (t, a, y0, user, uAt, tools, reply, rAt) => {
+  const z = ease(prog(t, uAt - .5, uAt + .2));
+  const tl = tools.map(([at, name, args, res, bad]) => { const k = ease(prog(t, at, at + .35)); if (!k) return ""; const done = t > at + .45; return `<div class="tool" style="opacity:${k};transform:translateY(${(1 - k) * 14}px)">${mark("#FF5A1F", "mk")}<code>${name}</code><span style="color:#a89d92">${args}</span><span class="res">${done ? res + (bad ? "" : '<span class="ok">✓</span>') : '<span style="color:#a89d92">…</span>'}</span></div>`; }).join("");
+  return `<div class="panel" style="left:330px;top:${y0}px;width:1260px;opacity:${a};transform:translateY(${(1 - z) * 50}px) scale(${.95 + .05 * z})">
+    <div class="chead"><svg viewBox="0 0 24 24" width="26" height="26"><path d="${CLAUDE}" fill="#D97757"/></svg>Claude<span class="mcp">allow · MCP connected</span></div>
+    <div class="cbody"><div class="ub">${typed(user, t, uAt, 40) || "&nbsp;"}</div>${tl}${t > rAt ? `<div class="ab" style="opacity:${ease(prog(t, rAt, rAt + .3))}">${reply}</div>` : ""}</div></div>`;
+};
+
+const S = [
+  // 1. Hook: two slams.
+  [0, 2.8, (t, a) => {
+    const s1 = slam(t, .15), s2 = slam(t, 1.15);
+    return `<div class="line huge" style="top:330px;opacity:${a * s1.o};transform:scale(${s1.s}) translateX(${s1.shake}px)">Your agent</div>
+      <div class="line huge acc" style="top:500px;opacity:${a * s2.o};transform:scale(${s2.s}) translateX(${s2.shake}px)">can ape now.</div>`;
+  }],
+  // 2. Ape in words: Claude calls the tools, trade fills.
+  [2.8, 8.2, (t, a) => chat(t, a, 170, "ape $5 into WIF", 3.1,
+      [[4.2, "allow_budget", "", "$25 per action · $97.90 left"], [4.9, "allow_quote", "buy WIF · 0.05 SOL", "27.4 WIF · Raydium"], [5.7, "allow_swap", "quote 7c1e…", "filled · registry #7"]],
+      "Bought <b>27.4 WIF</b> for 0.05 SOL. Receipt <b>#7</b>, anchored on Solana.", 6.5)
+    + `<div class="line" style="top:900px;opacity:${a}">${words("Ape in words. It fills on Jupiter.", t, 3.2, .1, [5, 6])}</div>`],
+  // 3. Honeypot: a token with freeze authority gets stamped REFUSED.
+  [8.2, 11.8, (t, a) => {
+    const z = ease(prog(t, 8.2, 8.7)), st = slam(t, 9.6);
+    return `<div class="panel" style="left:560px;top:180px;width:800px;opacity:${a};transform:scale(${.95 + .05 * z}) translateX(${st.shake}px)">
+      <div class="tok"><div class="ic" style="background:linear-gradient(135deg,#9be15d,#00e3ae)">$H</div><div><div style="font-size:40px;font-weight:700">$HONEY</div><div style="font-size:22px;color:#a89d92">launched 4 min ago · 312 holders</div></div></div>
+      <div class="kv"><span>Liquidity</span><b>$41,200</b><span>Mint authority</span><b>off</b><span>Freeze authority</span><b class="bad">ON</b><span>Top 10 holders</span><b>38%</b></div></div>
+      <div class="stamp" style="opacity:${st.o};transform:translate(-50%,-50%) rotate(-8deg) scale(${st.s})">Refused</div>
+      <div class="line" style="top:860px;opacity:${a}">${words("Honeypot? Your agent won't touch it.", t, 8.5, .1, [3, 4, 5])}</div>`;
+  }],
+  // 4. Over the bag size: cap stops it.
+  [11.8, 15.6, (t, a) => chat(t, a, 200, "ape $500 into JUP", 12.1, [[13.2, "allow_quote", "buy JUP · 5 SOL", "$476.11"], [13.8, "allow_swap", "", '<span style="color:#ff6a4a">over your $25 cap · nothing sent</span>', true]], "", 99)
+    + (() => { const st = slam(t, 14.2); return `<div class="stamp" style="top:640px;opacity:${st.o};transform:translate(-50%,-50%) rotate(6deg) scale(${st.s});font-size:80px">Capped</div>`; })()
+    + `<div class="line" style="top:900px;opacity:${a}">${words("It never goes past the bag size you set.", t, 12.2, .09, [5, 6, 7, 8])}</div>`],
+  // 5. Kill switch: revoke in one command.
+  [15.6, 19.0, (t, a) => {
+    const L = [["c", "allow revoke --sweep", 15.9], ["o", '{ "revoked": true, "swept": "4xQ…9Lm" }', 16.8], ["c", "allow buy WIF 0.05", 17.0], ["e", "allow: This allowance was revoked by its owner. Nothing was done.", 17.8]];
+    let html = ""; for (const [k, s, at] of L) { if (t < at) break; html += k === "c" ? `<span class="c"><b>$</b> ${typed(s, t, at, 26)}</span>\n` : `<span class="${k}">${s}</span>\n`; }
+    const z = ease(prog(t, 15.6, 16.1)), fl = Math.sin(prog(t, 17.8, 18.4) * Math.PI);
+    return `<div class="panel term" style="left:300px;top:220px;width:1320px;height:420px;background:#0d0c0c;opacity:${a};transform:scale(${.95 + .05 * z});box-shadow:0 0 0 1px rgba(255,190,150,.16),0 0 ${100 * fl}px ${14 * fl}px rgba(255,80,40,.6)"><pre>${html}<span class="caret" style="opacity:${Math.floor(t * 2) % 2}"></span></pre></div>
+      <div class="line" style="top:760px;opacity:${a}">${words("Pull the plug in one command.", t, 15.9, .1, [4, 5])}</div>`;
+  }],
+  // 6. Proof: the registry, every line anchored.
+  [19.0, 22.4, (t, a) => {
+    const rows = [["#7", "BUY", "27.4 WIF for 0.05 SOL"], ["#6", "x402", "Paid $0.10 in USDC · fee paid by seller"], ["#5", "SELL", "312,600 BONK for 0.01 SOL"], ["#4", "BUY", "625,200 BONK for 0.02 SOL"]];
+    const z = ease(prog(t, 19.0, 19.5));
+    const r = rows.map(([k, tag, d], i) => { const kk = ease(prog(t, 19.4 + i * .25, 19.8 + i * .25)), an = t > 20.4 + i * .25; return `<div class="row" style="opacity:${kk};transform:translateX(${(1 - kk) * 40}px)"><span class="k">${k}</span><span class="tag">${tag}</span><span>${d}</span><span class="anc">${an ? "✓ ANCHORED ON SOLANA" : ""}</span></div>`; }).join("");
+    return `<div class="panel" style="left:360px;top:200px;width:1200px;opacity:${a};transform:scale(${.95 + .05 * z})"><div class="chead">${mark("#FF5A1F").replace("<svg", '<svg width="22" height="22"')}Public registry<span class="mcp" style="--x:0">hash-chained · signed · Merkle root in an SPL memo</span></div>${r}</div>
+      <div class="line" style="top:820px;opacity:${a}">${words("Every trade on chain. No larp.", t, 19.3, .11, [4, 5])}</div>`;
+  }],
+  // 7. Works with + open source.
+  [22.4, 25.0, (t, a) => {
+    const k = (i) => ease(prog(t, 22.6 + i * .15, 23.1 + i * .15));
+    return `<div class="line small" style="top:330px;opacity:${a}">Works with</div>
+      <div style="position:absolute;left:0;right:0;top:420px;opacity:${a}" class="logos">
+        <div style="opacity:${k(0)}"><svg viewBox="0 0 24 24" width="56" height="56"><path d="${CLAUDE}" fill="#D97757"/></svg>Claude</div>
+        <div style="opacity:${k(1)}"><svg viewBox="0 0 24 24" width="56" height="56"><path d="${OPENAI}" fill="#F6F4EF"/></svg>ChatGPT</div>
+        <div style="opacity:${k(2)}">any MCP client</div></div>
+      <div class="line" style="top:620px;opacity:${a}">${words("Open source. github.com/bigrceo/allow", t, 23.0, .12, [2])}</div>`;
+  }],
+  // 8. Live.
+  [25.0, 30.0, (t, a) => {
+    const s1 = slam(t, 25.1), k = ease(prog(t, 25.8, 26.4)), g = .6 + .4 * Math.sin(t * 4);
+    return `<div style="position:absolute;left:50%;top:150px;width:150px;margin-left:-75px;opacity:${k};filter:drop-shadow(0 0 ${20 + 20 * g}px rgba(255,90,31,.9))">${mark()}</div>
+      <div class="line huge" style="top:340px;opacity:${s1.o};transform:scale(${s1.s}) translateX(${s1.shake}px)"><span class="acc">$ALLOW</span> is live</div>
+      <div class="line" style="top:560px;opacity:${ease(prog(t, 26.0, 26.6))}">${CA ? `<span class="ca">${CA}</span>` : `<span class="ca">CA in bio</span>`}</div>
+      <div class="line" style="top:720px;font-size:44px">${words("Give your agent a wallet. Sealed by your rules.", t, 26.6, .08, [5, 6, 7, 8])}</div>
+      <div class="line small" style="top:840px;opacity:${ease(prog(t, 27.6, 28.2))}">useallow.xyz</div>`;
+  }],
+];
+
+window.render = (t) => {
+  const power = t < 2.8 ? .25 + .2 * ease(prog(t, 0, 1)) : t > 25 ? .9 : .32;
+  drawBg(t, power);
+  let html = ""; for (const [a, b, f] of S) if (t >= a - .01 && t <= b + .4) html += f(t, env(t, a, b + .35));
+  stage.innerHTML = html;
+};
+window.ready = document.fonts.ready;
+render(0);
+</script>
+</body>
+</html>

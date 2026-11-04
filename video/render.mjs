@@ -4,18 +4,19 @@
 import { chromium } from "/Users/rayane/hush/node_modules/playwright-core/index.mjs";
 import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
-const FF = "/Users/rayane/clipfun/node_modules/ffmpeg-static/ffmpeg", FPS = 30, DUR = 32;
+const FF = "/Users/rayane/clipfun/node_modules/ffmpeg-static/ffmpeg", FPS = 30;
+const COMP = process.env.COMP || "comp.html", DUR = Number(process.env.DUR || 32), OUT = process.env.OUT || "out/silent.mp4";
 const browser = await chromium.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
 const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
-await page.goto("file://" + new URL("comp.html", import.meta.url).pathname);
+await page.goto("file://" + new URL(COMP, import.meta.url).pathname + (process.env.CA ? `?ca=${process.env.CA}` : ""));
 await page.evaluate(() => window.ready);
 const [mode, ...ts] = process.argv.slice(2);
 if (mode === "stills") {
   mkdirSync("stills", { recursive: true });
-  for (const t of ts) { await page.evaluate((t) => render(+t), t); await page.screenshot({ path: `stills/t-${t}.jpg`, type: "jpeg", quality: 85 }); }
+  for (const t of ts) { await page.evaluate((t) => render(+t), t); await page.screenshot({ path: `stills/${COMP.replace(".html", "")}-${t}.jpg`, type: "jpeg", quality: 85 }); }
 } else {
   mkdirSync("out", { recursive: true });
-  const ff = spawn(FF, ["-y", "-f", "image2pipe", "-framerate", String(FPS), "-c:v", "mjpeg", "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "16", "-preset", "slow", "out/silent.mp4"], { stdio: ["pipe", "inherit", "inherit"] });
+  const ff = spawn(FF, ["-y", "-f", "image2pipe", "-framerate", String(FPS), "-c:v", "mjpeg", "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "16", "-preset", "slow", OUT], { stdio: ["pipe", "inherit", "inherit"] });
   for (let f = 0; f < FPS * DUR; f++) {
     await page.evaluate((t) => render(t), f / FPS);
     ff.stdin.write(await page.screenshot({ type: "jpeg", quality: 95 }));
