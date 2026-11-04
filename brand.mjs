@@ -5,7 +5,7 @@ export const BRAND = {
   domain: "useallow.xyz",
   x: "useallow",
   repo: "https://github.com/bigrceo/allow",
-  ca: "", // paste the pump.fun mint here at launch: nav, site and token section pick it up
+  ca: "CvzvP6xmhgY8acketkxbweb8PzMWmYKz3Fco5KfVpump", // paste the pump.fun mint here at launch: nav, site and token section pick it up
   version: "0.1.0",
   tagline: "Give your agent a wallet.",
   seal: "Sealed by your rules.",
