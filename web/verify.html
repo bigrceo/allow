@@ -64,5 +64,6 @@ $("#go2").onclick = () => { try { run(JSON.parse($("#paste").value)); } catch { 
 const q = new URLSearchParams(location.search).get("seq");
 if (q) { $("#seq").value = q; bySeq(q); }
 </script>
+<script src="/pixels.js" defer></script>
 </body>
 </html>

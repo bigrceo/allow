@@ -57,7 +57,7 @@ async function load() {
   $("#mode").style.color = b.revoked ? "var(--bad)" : "";
   $("#addr").textContent = w.address;
   $("#sol").textContent = w.sol == null ? "?" : `${(+w.sol).toFixed(4)} SOL`;
-  $("#cluster").textContent = st.cluster;
+  $("#cluster").textContent = `${w.usdc ? `${(+w.usdc).toFixed(2)} USDC · ` : ""}${st.cluster}`;
   $("#left").textContent = fmt(b.leftTodayUsd);
   $("#dayBar").style.width = `${Math.min(100, (b.usedTodayUsd / b.dailyUsd) * 100)}%`;
   $("#dayTxt").textContent = `${fmt(b.usedTodayUsd)} of ${fmt(b.dailyUsd)} used`;
@@ -94,5 +94,6 @@ $("#policy").onsubmit = async (ev) => {
 $("#revoke").onclick = async () => { await post("/api/owner/revoke", { revoked: !st.budget.revoked }); load(); };
 load(); setInterval(load, 5000);
 </script>
+<script src="/pixels.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 224"><defs>
+<linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a0a04"/><stop offset="1" stop-color="#5a1804"/></linearGradient>
+<filter id="g"><feGaussianBlur stdDeviation="3"/></filter></defs>
+<rect width="480" height="224" fill="url(#b)"/>
+<g stroke="#FF7A3D" stroke-width="2.5" fill="none" opacity=".9">
+<path d="M240 40 L140 100 M240 40 L340 100 M140 100 L90 160 M140 100 L190 160 M340 100 L290 160 M340 100 L390 160"/></g>
+<g stroke="#FFB36B" stroke-width="6" fill="none" filter="url(#g)" opacity=".7"><path d="M240 40 L340 100 L290 160"/></g>
+<g fill="#FFE0C9"><circle cx="240" cy="40" r="9"/><circle cx="140" cy="100" r="7"/><circle cx="340" cy="100" r="7"/>
+<circle cx="90" cy="160" r="6"/><circle cx="190" cy="160" r="6"/><circle cx="290" cy="160" r="8" fill="#FF5A1F" stroke="#FFE0C9" stroke-width="3"/><circle cx="390" cy="160" r="6"/></g>
+<g font-family="Inter, sans-serif" font-weight="600" font-size="13" letter-spacing="2" fill="#FFD9C2" opacity=".8"><text x="24" y="206">ROOT ANCHORED ON SOLANA</text></g></svg>
