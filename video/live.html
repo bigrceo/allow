@@ -93,39 +93,51 @@ const S = [
     return `<div class="line huge" style="top:330px;opacity:${a * s1.o};transform:scale(${s1.s}) translateX(${s1.shake}px)">Your agent</div>
       <div class="line huge acc" style="top:500px;opacity:${a * s2.o};transform:scale(${s2.s}) translateX(${s2.shake}px)">can ape now.</div>`;
   }],
-  // 2. Ape in words: Claude calls the tools, trade fills.
-  [2.8, 8.2, (t, a) => chat(t, a, 170, "ape $5 into WIF", 3.1,
-      [[4.2, "allow_budget", "", "$25 per action · $97.90 left"], [4.9, "allow_quote", "buy WIF · 0.05 SOL", "27.4 WIF · Raydium"], [5.7, "allow_swap", "quote 7c1e…", "filled · registry #7"]],
-      "Bought <b>27.4 WIF</b> for 0.05 SOL. Receipt <b>#7</b>, anchored on Solana.", 6.5)
-    + `<div class="line" style="top:900px;opacity:${a}">${words("Ape in words. It fills on Jupiter.", t, 3.2, .1, [5, 6])}</div>`],
-  // 3. Honeypot: a token with freeze authority gets stamped REFUSED.
-  [8.2, 11.8, (t, a) => {
-    const z = ease(prog(t, 8.2, 8.7)), st = slam(t, 9.6);
-    return `<div class="panel" style="left:560px;top:180px;width:800px;opacity:${a};transform:scale(${.95 + .05 * z}) translateX(${st.shake}px)">
-      <div class="tok"><div class="ic" style="background:linear-gradient(135deg,#9be15d,#00e3ae)">$H</div><div><div style="font-size:40px;font-weight:700">$HONEY</div><div style="font-size:22px;color:#a89d92">launched 4 min ago · 312 holders</div></div></div>
-      <div class="kv"><span>Liquidity</span><b>$41,200</b><span>Mint authority</span><b>off</b><span>Freeze authority</span><b class="bad">ON</b><span>Top 10 holders</span><b>38%</b></div></div>
-      <div class="stamp" style="opacity:${st.o};transform:translate(-50%,-50%) rotate(-8deg) scale(${st.s})">Refused</div>
-      <div class="line" style="top:860px;opacity:${a}">${words("Honeypot? Your agent won't touch it.", t, 8.5, .1, [3, 4, 5])}</div>`;
-  }],
-  // 4. Over the bag size: cap stops it.
-  [11.8, 15.6, (t, a) => chat(t, a, 200, "ape $500 into JUP", 12.1, [[13.2, "allow_quote", "buy JUP · 5 SOL", "$476.11"], [13.8, "allow_swap", "", '<span style="color:#ff6a4a">over your $25 cap · nothing sent</span>', true]], "", 99)
-    + (() => { const st = slam(t, 14.2); return `<div class="stamp" style="top:640px;opacity:${st.o};transform:translate(-50%,-50%) rotate(6deg) scale(${st.s});font-size:80px">Capped</div>`; })()
-    + `<div class="line" style="top:900px;opacity:${a}">${words("It never goes past the bag size you set.", t, 12.2, .09, [5, 6, 7, 8])}</div>`],
-  // 5. Kill switch: revoke in one command.
-  [15.6, 19.0, (t, a) => {
-    const L = [["c", "allow revoke --sweep", 15.9], ["o", '{ "revoked": true, "swept": "4xQ…9Lm" }', 16.8], ["c", "allow buy WIF 0.05", 17.0], ["e", "allow: This allowance was revoked by its owner. Nothing was done.", 17.8]];
-    let html = ""; for (const [k, s, at] of L) { if (t < at) break; html += k === "c" ? `<span class="c"><b>$</b> ${typed(s, t, at, 26)}</span>\n` : `<span class="${k}">${s}</span>\n`; }
-    const z = ease(prog(t, 15.6, 16.1)), fl = Math.sin(prog(t, 17.8, 18.4) * Math.PI);
-    return `<div class="panel term" style="left:300px;top:220px;width:1320px;height:420px;background:#0d0c0c;opacity:${a};transform:scale(${.95 + .05 * z});box-shadow:0 0 0 1px rgba(255,190,150,.16),0 0 ${100 * fl}px ${14 * fl}px rgba(255,80,40,.6)"><pre>${html}<span class="caret" style="opacity:${Math.floor(t * 2) % 2}"></span></pre></div>
-      <div class="line" style="top:760px;opacity:${a}">${words("Pull the plug in one command.", t, 15.9, .1, [4, 5])}</div>`;
-  }],
-  // 6. Proof: the registry, every line anchored.
-  [19.0, 22.4, (t, a) => {
-    const rows = [["#7", "BUY", "27.4 WIF for 0.05 SOL"], ["#6", "x402", "Paid $0.10 in USDC · fee paid by seller"], ["#5", "SELL", "312,600 BONK for 0.01 SOL"], ["#4", "BUY", "625,200 BONK for 0.02 SOL"]];
-    const z = ease(prog(t, 19.0, 19.5));
-    const r = rows.map(([k, tag, d], i) => { const kk = ease(prog(t, 19.4 + i * .25, 19.8 + i * .25)), an = t > 20.4 + i * .25; return `<div class="row" style="opacity:${kk};transform:translateX(${(1 - kk) * 40}px)"><span class="k">${k}</span><span class="tag">${tag}</span><span>${d}</span><span class="anc">${an ? "✓ ANCHORED ON SOLANA" : ""}</span></div>`; }).join("");
-    return `<div class="panel" style="left:360px;top:200px;width:1200px;opacity:${a};transform:scale(${.95 + .05 * z})"><div class="chead">${mark("#FF5A1F").replace("<svg", '<svg width="22" height="22"')}Public registry<span class="mcp" style="--x:0">hash-chained · signed · Merkle root in an SPL memo</span></div>${r}</div>
-      <div class="line" style="top:820px;opacity:${a}">${words("Every trade on chain. No larp.", t, 19.3, .11, [4, 5])}</div>`;
+  // 2-6. One continuous take on a desktop: Claude, the dashboard, a terminal and the registry, the camera gliding between them.
+  [2.8, 22.4, (t, a) => {
+    // Chat: messages pile up bottom-anchored, so the newest is always in view.
+    const msgs = [];
+    const user = (at, txt) => t > at && msgs.push(`<div class="ub" style="opacity:${ease(prog(t, at, at + .3))}">${typed(txt, t, at, 34)}</div>`);
+    const tool = (at, name, args, res, bad) => { if (t <= at) return; const done = t > at + .45; msgs.push(`<div class="tool" style="opacity:${ease(prog(t, at, at + .3))}">${mark("#FF5A1F", "mk")}<code>${name}</code><span style="color:#a89d92">${args}</span><span class="res">${done ? (bad ? `<span style="color:#ff6a4a">${res}</span>` : res + '<span class="ok">✓</span>') : '<span style="color:#a89d92">…</span>'}</span></div>`); };
+    const reply = (at, html) => t > at && msgs.push(`<div class="ab" style="opacity:${ease(prog(t, at, at + .3))}">${html}</div>`);
+    user(2.9, "ape $5 into WIF"); tool(3.9, "allow_budget", "", "$25 per action · $97.90 left"); tool(4.5, "allow_quote", "buy WIF · 0.05 SOL", "27.4 WIF · Raydium"); tool(5.2, "allow_swap", "quote 7c1e…", "filled · registry #7");
+    reply(5.9, "Bought <b>27.4 WIF</b> for 0.05 SOL. Receipt <b>#7</b>, anchored on Solana.");
+    user(7.3, "ape $HONEY too"); tool(8.2, "allow_quote", "buy HONEY · 0.05 SOL", "freeze authority ON · refused", true);
+    reply(8.9, "Refused: <b>$HONEY</b>'s creator can still freeze holders. Nothing was sent.");
+    user(10.2, "ok ape $500 into JUP"); tool(11.1, "allow_quote", "buy JUP · 5 SOL", "$476.11"); tool(11.7, "allow_swap", "", "over your $25 cap · nothing sent", true);
+    const chat = `<div class="panel" style="left:0;top:40px;width:1300px;height:800px;display:flex;flex-direction:column">
+      <div class="chead"><svg viewBox="0 0 24 24" width="26" height="26"><path d="${CLAUDE}" fill="#D97757"/></svg>Claude<span class="mcp">allow · MCP connected</span></div>
+      <div class="cbody" style="flex:1;justify-content:flex-end;overflow:hidden">${msgs.join("")}</div></div>`;
+    // Dashboard: the real screenshot; "left today" drops after the buy.
+    const left = t > 5.4 ? "$93.15" : "$97.90";
+    const dash = `<div class="panel" style="left:1400px;top:0;width:1200px;height:900px;background:#0d0c0c"><div class="chead" style="height:46px;font-size:15px;color:#cbbfb4;justify-content:center">${mark().replace("<svg", '<svg width="14" height="14"')} useallow.xyz/dashboard</div>
+      <div style="position:relative;height:750px;overflow:hidden"><img src="screens/dashboard.png" style="width:1200px;display:block">
+      <div style="position:absolute;left:388px;top:262px;width:170px;height:46px;background:#151414;font:600 34px Inter;letter-spacing:-.02em;color:#F6F4EF;display:flex;align-items:center;${t > 5.4 && t < 6.4 ? "text-shadow:0 0 24px #FF5A1F;" : ""}">${left}</div></div></div>`;
+    // Terminal: revoke.
+    const L = [["c", "allow revoke --sweep", 13.9], ["o", '{ "revoked": true, "swept": "4xQ…9Lm" }', 14.8], ["c", "allow buy WIF 0.05", 15.0], ["e", "allow: This allowance was revoked by its owner. Nothing was done.", 15.8]];
+    let th = ""; for (const [k, s_, at] of L) { if (t < at) break; th += k === "c" ? `<span class="c"><b>$</b> ${typed(s_, t, at, 26)}</span>\n` : `<span class="${k}">${s_}</span>\n`; }
+    const fl = Math.sin(prog(t, 15.8, 16.4) * Math.PI);
+    const term = `<div class="panel term" style="left:0;top:980px;width:1300px;height:560px;background:#0d0c0c;box-shadow:0 0 0 1px rgba(255,190,150,.16),0 0 ${100 * fl}px ${14 * fl}px rgba(255,80,40,.6)"><div class="chead" style="height:46px"></div><pre>${th}<span class="caret" style="opacity:${Math.floor(t * 2) % 2}"></span></pre></div>`;
+    // Registry: rows land, then each gets anchored.
+    const rows = [["#7", "BUY", "27.4 WIF for 0.05 SOL"], ["#6", "x402", "Paid $0.10 in USDC · fee paid by seller"], ["#5", "SELL", "312,600 BONK for 0.01 SOL"], ["#4", "BUY", "625,200 BONK for 0.02 SOL"], ["#3", "x402", "Paid $0.10 in USDC · fee paid by seller"]];
+    const reg = `<div class="panel" style="left:1400px;top:980px;width:1200px;height:560px"><div class="chead">${mark().replace("<svg", '<svg width="22" height="22"')}Public registry<span class="mcp">hash-chained · signed · Merkle root in an SPL memo</span></div>
+      ${rows.map(([k, tag, d], i) => { const kk = ease(prog(t, 16.9 + i * .2, 17.3 + i * .2)); return `<div class="row" style="opacity:${.25 + .75 * kk}"><span class="k">${k}</span><span class="tag">${tag}</span><span>${d}</span><span class="anc">${t > 17.6 + i * .25 ? "✓ ANCHORED ON SOLANA" : ""}</span></div>`; }).join("")}</div>`;
+    // Stamps live in the world, over the chat.
+    const st = (at, txt, x, y, r) => { const q = slam(t, at); if (!q.o) return ""; return `<div class="stamp" style="left:${x}px;top:${y}px;opacity:${q.o * (1 - ease(prog(t, at + 1.6, at + 2.0)))};transform:translate(-50%,-50%) rotate(${r}deg) scale(${q.s}) translateX(${q.shake}px)">${txt}</div>`; };
+    // Camera keys: [t, worldX, worldY, scale]; the world point sits at screen center.
+    const K = [[2.8, 650, 450, .9], [3.5, 650, 450, 1.0], [5.3, 650, 450, 1.0], [5.8, 1700, 300, 1.0], [6.6, 1700, 300, 1.0], [7.1, 650, 450, 1.0], [12.9, 650, 450, 1.0], [13.7, 650, 1260, 1.25], [16.2, 650, 1260, 1.25], [16.9, 2000, 1260, 1.22], [18.8, 2000, 1260, 1.22], [20.0, 1300, 770, .62], [22.4, 1300, 770, .58]];
+    let i = 0; while (i < K.length - 2 && t > K[i + 1][0]) i++;
+    const [ta, ax, ay, as] = K[i], [tb, bx, by, bs] = K[i + 1], k = inout(prog(t, ta, tb));
+    const cx = ax + (bx - ax) * k, cy = ay + (by - ay) * k, sc = as + (bs - as) * k;
+    // A cursor that drifts with the take.
+    const cur = [cx + 120 * Math.sin(t * .7), cy + 80 * Math.cos(t * .9)];
+    const cap = (from, to, text, acc) => t >= from && t < to ? `<div class="line" style="top:960px;opacity:${env(t, from, to, .3, .3)}">${words(text, t, from + .05, .09, acc)}</div>` : "";
+    return `<div style="position:absolute;left:0;top:0;transform-origin:0 0;opacity:${a};transform:translate(${960 - cx * sc}px,${540 - cy * sc}px) scale(${sc})">
+        ${chat}${dash}${term}${reg}${st(8.6, "Refused", 650, 560, -8)}${st(12.1, "Capped", 650, 640, 6)}
+        <svg viewBox="0 0 24 24" style="position:absolute;left:${cur[0]}px;top:${cur[1]}px;width:${34 / sc}px;height:${34 / sc}px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6))"><path d="M4 2l16 9-7 2-3 7z" fill="#fff" stroke="#000" stroke-width="1.2"/></svg></div>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:240px;background:linear-gradient(transparent,rgba(0,0,0,.85))"></div>
+      ${cap(2.9, 7.2, "Ape in words. It fills on Jupiter.", [5, 6])}${cap(7.2, 10.2, "Honeypot? Your agent won't touch it.", [3, 4, 5])}${cap(10.2, 13.6, "It never goes past the bag size you set.", [5, 6, 7, 8])}
+      ${cap(13.6, 16.7, "Pull the plug in one command.", [4, 5])}${cap(16.7, 19.6, "Every trade on chain. No larp.", [4, 5])}${cap(19.6, 22.4, "One wallet. Your rules. Any agent.", [3, 4])}`;
   }],
   // 7. Works with + open source.
   [22.4, 25.0, (t, a) => {
@@ -148,10 +160,43 @@ const S = [
   }],
 ];
 
-window.render = (t) => {
+
+// 0. Cold open: full light, the mark slams out of the depth, a shockwave, candles climbing, the curve filling.
+const INTRO = 2.6;
+function intro(t) {
+  const k = ease(prog(t, 0, .5)), sc = 2.6 - 1.6 * back(prog(t, 0, .55)), rot = -30 + 30 * inout(prog(t, 0, 1.6));
+  const layers = [...Array(26)].map((_, i) => `<path d="${P}" fill="${i === 25 ? "url(#face)" : `rgb(${110 + i * 5},${32 + i * 2},${8 + i})`}" fill-rule="evenodd" transform="translate(${i * .5} ${i * .5})"/>`).join("");
+  const sweep = 300 * prog(t, .3, 1.3) - 100;
+  const rings = [0, .18, .36].map((d) => { const r = prog(t, .25 + d, 1.25 + d); if (!r || r >= 1) return ""; return `<circle cx="960" cy="470" r="${120 + 760 * ease(r)}" fill="none" stroke="#FF8A4C" stroke-width="${6 * (1 - r)}" opacity="${(1 - r) * .8}"/>`; }).join("");
+  // candles: deterministic climb, green bodies with orange wicks
+  let c = "", y = 900;
+  for (let i = 0; i < 34; i++) {
+    const at = .15 + i * .045, kk = ease(prog(t, at, at + .25)); if (!kk) continue;
+    const up = (i * 37 % 11) > 2, h = 18 + (i * 53 % 40), x = 120 + i * 50;
+    const top = up ? y - h : y, bot = up ? y : y + h * .5; y = up ? y - h * .55 : y + h * .25;
+    c += `<line x1="${x}" y1="${top - 14}" x2="${x}" y2="${bot + 10}" stroke="${up ? "#3ccf7a" : "#ff6a4a"}" stroke-width="2" opacity="${kk * .7}"/><rect x="${x - 12}" y="${up ? bot - (bot - top) * kk : top}" width="24" height="${(bot - top) * kk}" rx="3" fill="${up ? "#3ccf7a" : "#ff6a4a"}" opacity="${.85 * kk}"/>`;
+  }
+  const curve = ease(prog(t, .4, 2.3));
+  return `<svg width="1920" height="1080" style="position:absolute;inset:0"><defs><linearGradient id="cv" x1="0" x2="1"><stop offset="0" stop-color="#FF5A1F"/><stop offset="1" stop-color="#3ccf7a"/></linearGradient></defs>
+      <g opacity="${.55 * k}">${c}</g>${rings}
+      <rect x="560" y="930" width="800" height="14" rx="7" fill="rgba(255,255,255,.08)"/><rect x="560" y="930" width="${800 * curve}" height="14" rx="7" fill="url(#cv)"/>
+      <text x="560" y="910" font-size="18" letter-spacing="5" fill="rgba(255,226,206,.75)">BONDING CURVE</text><text x="1360" y="910" text-anchor="end" font-size="18" letter-spacing="3" fill="#3ccf7a">${Math.round(curve * 100)}%</text></svg>
+    <div style="position:absolute;left:50%;top:470px;width:520px;height:520px;margin:-260px 0 0 -260px;opacity:${k};transform:rotateY(${rot}deg) scale(${sc});filter:drop-shadow(0 0 ${60 + 40 * Math.sin(t * 6)}px rgba(255,90,31,.85))">
+      <svg viewBox="-6 -6 104 104" width="520" height="520"><defs><linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1E6"/><stop offset=".45" stop-color="#FF8A4C"/><stop offset="1" stop-color="#E4420E"/></linearGradient>
+      <linearGradient id="sw" gradientUnits="userSpaceOnUse" x1="${sweep}" y1="0" x2="${sweep + 30}" y2="88"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>${layers}<path d="${P}" fill="url(#sw)" fill-rule="evenodd" transform="translate(12.5 12.5)"/></svg></div>
+    <div class="line small" style="top:110px;opacity:${ease(prog(t, .5, 1))};letter-spacing:.4em">The agent meta · Solana</div>
+    <div style="position:absolute;left:0;right:0;top:170px;display:flex;justify-content:center;gap:40px;opacity:${ease(prog(t, .8, 1.3))}">
+      <svg viewBox="0 0 24 24" width="40" height="40"><path d="${CLAUDE}" fill="#D97757"/></svg><svg viewBox="0 0 24 24" width="40" height="40"><path d="${OPENAI}" fill="#F6F4EF"/></svg>${mark("#FF5A1F").replace("<svg", '<svg width="40" height="40"')}</div>
+    <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 44%, rgba(255,170,100,${Math.max(0, 1 - t * 3) * .9}), transparent 60%)"></div>`;
+}
+
+const introLayer = (T) => `<div style="position:absolute;inset:0;opacity:${1 - ease(prog(T, INTRO - .3, INTRO + .3))};transform:scale(${1 + .15 * ease(prog(T, INTRO - .3, INTRO + .3))})">${intro(T)}</div>`;
+window.render = (T) => {
+  if (T < INTRO + .3) { drawBg(T, 1.0 - .5 * prog(T, 1.8, INTRO)); stage.innerHTML = introLayer(T); if (T < INTRO) return; }
+  const t = T - INTRO;
   const power = t < 2.8 ? .25 + .2 * ease(prog(t, 0, 1)) : t > 25 ? .9 : .32;
-  drawBg(t, power);
-  let html = ""; for (const [a, b, f] of S) if (t >= a - .01 && t <= b + .4) html += f(t, env(t, a, b + .35));
+  if (T >= INTRO + .3) drawBg(t, power);
+  let html = T < INTRO + .3 ? introLayer(T) : ""; for (const [a, b, f] of S) if (t >= a - .01 && t <= b + .4) html += f(t, env(t, a, b + .35));
   stage.innerHTML = html;
 };
 window.ready = document.fonts.ready;
