@@ -47,7 +47,25 @@ def center(text, y, f, fill, spacing=0):
     else: d.text((x, y), text, font=f, fill=fill)
 center("The next trader on Solana is your agent.", 158, font(50), (246, 244, 239))
 center("Sealed by your rules.", 226, font(50), (255, 122, 61))
-center("CLAUDE · CHATGPT · X402 · JUPITER · ON-CHAIN REGISTRY", 316, font(17, True), (217, 207, 196), spacing=5)
+# Real logos instead of names: Claude, ChatGPT, x402 (wordmark, it has no mark), Solana, Jupiter.
+LOGOS = "/private/tmp/claude-501/-Users-rayane-agentkit/8ec6f2cf-646e-4506-a046-f43a838c4c57/scratchpad/logos"
+def tinted(name, color=None, gradient=None, size=40):
+    im = Image.open(f"{LOGOS}/{name}.png").convert("RGBA").resize((size, size), Image.LANCZOS)
+    if gradient:
+        a = np.asarray(im)[..., 3]; xs = np.linspace(0, 1, size)[None, :, None]
+        rgb = (np.array(gradient[0]) * (1 - xs) + np.array(gradient[1]) * xs).repeat(size, 0)
+        return Image.fromarray(np.dstack([rgb.astype("uint8"), a]))
+    if color:
+        solid = Image.new("RGBA", im.size, color + (255,)); solid.putalpha(im.getchannel("A")); return solid
+    return im
+items = [tinted("claude", (217, 119, 87)), tinted("openai", (246, 244, 239)), "x402", tinted("solana", gradient=((153, 69, 255), (20, 241, 149))), tinted("jupiter")]
+fx = font(30, True); gap = 56
+widths = [d.textlength("x402", font=fx) if it == "x402" else it.width for it in items]
+x = CX - (sum(widths) + gap * (len(items) - 1)) / 2; y = 318
+for it, wd in zip(items, widths):
+    if it == "x402": d.text((x, y + 2), "x402", font=fx, fill=(246, 244, 239))
+    else: img.paste(it, (int(x), y), it)
+    x += wd + gap
 img.save(f"{OUT}/banner.png")
 
 p = Image.open(f"{OUT}/pfp.png").convert("RGB").resize((320, 320))
