@@ -30,14 +30,16 @@
   </div>
   </div>
   <div class="panels">
-    <div class="panel">
-      <div class="ph"><b><span data-logo></span>Agent log</b><span class="label" id="talk">Live</span></div>
-      <div class="pb" id="chatFeed"></div>
-    </div>
-    <div class="panel">
-      <div class="ph"><b><span data-logo></span>Live registry</b><span class="label">On-chain actions</span></div>
-      <div class="pb" id="actFeed"></div>
-      <a class="pf" href="/dashboard"><span>Every action</span><span>↗</span></a>
+    <div class="panel hiw">
+      <div class="ph"><b><span data-logo></span>How it works</b><span class="label" id="hiwStep">01 / 04</span></div>
+      <ol class="hsteps">
+        <li><span class="n">01</span><div><b>Ask in words</b><p>"ape $5 into WIF" in Claude or ChatGPT.</p></div></li>
+        <li><span class="n">02</span><div><b>Checked in code</b><p>Within your caps. Honeypots refused.</p></div></li>
+        <li><span class="n">03</span><div><b>Filled on Jupiter</b><p>Re-priced first, floor held, signed by the agent.</p></div></li>
+        <li><span class="n">04</span><div><b>Proved on Solana</b><p>Signed, chained, anchored. Check it on /verify.</p></div></li>
+      </ol>
+      <div class="hprev" id="hiwPrev"></div>
+      <div class="hbar"><i id="hiwBar"></i></div>
     </div>
   </div>
 </div></header>
@@ -226,7 +228,7 @@ function say(e) {
   if (e.kind === "swap") return d.side === "buy"
     ? `Bought ${amt(d.out, d.outDecimals)} $${esc(d.token)} for ${amt(d.in, d.inDecimals)} ${d.quote} ($${e.usd.toFixed(2)}). Floor held, route ${esc(d.route.join(" + "))}.`
     : `Sold ${amt(d.in, d.inDecimals)} $${esc(d.token)} for ${amt(d.out, d.outDecimals)} ${d.quote}. Sells don't touch the allowance.`;
-  if (e.kind === "pay") return `Paid $${e.usd.toFixed(4)} in ${esc(d.asset ?? "SOL")} over x402 to ${esc(new URL(d.url).host)}${d.feePaidBy === "seller" ? ", fee paid by the seller" : ""}: ${esc(d.description)}.`;
+  if (e.kind === "pay") return `Paid $${e.usd.toFixed(2)} in ${esc(d.asset ?? "SOL")} over x402${d.feePaidBy === "seller" ? ", no SOL needed" : ""}`;
   if (e.kind === "policy.set") return `New allowance from my owner: $${d.perTxUsd} per action, $${d.dailyUsd} a day, $${d.totalUsd} in total.`;
   if (e.kind === "wallet.created") return `Wallet created on ${esc(d.cluster)}. The key stays on my owner's machine.`;
   if (e.kind === "revoke") return "My owner revoked the allowance. I stop here.";
@@ -255,12 +257,12 @@ function count(el, to, fmt) {
 }
 async function load() {
   const st = await (await fetch("/api/state")).json().catch(() => ({}));
-  if (!st.ready) { $("#chatFeed").innerHTML = `<div class="it"><p>No agent yet. Run <code>allow init</code>.</p></div>`; return; }
+  if (!st.ready) { if ($("#actFeed")) $("#actFeed").innerHTML = `<div class="it"><p>No agent yet. Run <code>allow init</code>.</p></div>`; return; }
   const name = esc(st.wallet.address);
-  $("#talk").textContent = st.budget.revoked ? "Revoked" : st.live ? "Live" : "Simulated fills";
-  $("#chatFeed").innerHTML = st.entries.slice(0, 12).map((e) => `<div class="it av"><i class="ava orb">${orbMark}</i><div><div class="ih"><b>agent ${short(st.wallet.address)}</b><span class="label">#${e.seq}</span><time>${ago(e.ts)}</time></div><p>${say(e)}</p></div></div>`).join("");
+  if ($("#talk")) $("#talk").textContent = st.budget.revoked ? "Revoked" : st.live ? "Live" : "Simulated fills";
+  if ($("#chatFeed")) $("#chatFeed").innerHTML = st.entries.slice(0, 12).map((e) => `<div class="it av"><i class="ava orb">${orbMark}</i><div><div class="ih"><b>agent ${short(st.wallet.address)}</b><span class="label">#${e.seq}</span><time>${ago(e.ts)}</time></div><p>${say(e)}</p></div></div>`).join("");
   const acts = st.entries.filter((e) => e.kind === "swap" || e.kind === "pay").slice(0, 10);
-  $("#actFeed").innerHTML = acts.length ? acts.map((e) => { const sig = e.data.signature; return `<div class="it"><div class="ih"><b>${tag(e)}</b><span class="label">${e.data.mode ?? st.cluster}</span><time>${ago(e.ts)}</time></div><p>${say(e).split(". ")[0]}.</p><div class="row lk">${sig ? `<a href="https://solscan.io/tx/${sig}${st.cluster === "mainnet" ? "" : st.cluster === "devnet" ? "?cluster=devnet" : "?cluster=custom&customUrl=" + encodeURIComponent(st.rpc)}" target="_blank" rel="noopener">Solscan ↗</a>` : ""}<a href="/verify?seq=${e.seq}">Verify ↗</a></div></div>`; }).join("") : `<div class="it"><p>No payment or trade yet.</p></div>`;
+  $("#actFeed").innerHTML = acts.length ? acts.map((e) => { const sig = e.data.signature; return `<div class="it"><div class="ih"><b>${tag(e)}</b>${e.data.mode ? `<span class="label">${e.data.mode}</span>` : ""}<time>${ago(e.ts)}</time></div><p>${say(e).split(". ")[0]}.</p><div class="row lk">${sig ? `<a href="https://solscan.io/tx/${sig}${st.cluster === "mainnet" ? "" : st.cluster === "devnet" ? "?cluster=devnet" : "?cluster=custom&customUrl=" + encodeURIComponent(st.rpc)}" target="_blank" rel="noopener">Solscan ↗</a>` : ""}<a href="/verify?seq=${e.seq}">Verify ↗</a></div></div>`; }).join("") : `<div class="it"><p>No payment or trade yet.</p></div>`;
   const b = st.budget, w = st.wallet;
   $("#rPer").textContent = `$${b.perActionUsd}`; $("#rDay").textContent = `$${b.dailyUsd}`; $("#rTot").textContent = `$${b.totalUsd}`; $("#rSlip").textContent = `${b.maxSlippagePct}%`;
   $("#acAva").className = "ac-ava orb"; $("#acAva").innerHTML = orbMark;
@@ -293,6 +295,24 @@ async function load() {
   count($("#sLeft"), st.budget.totalUsd - st.budget.usedTotalUsd, (n) => `$${n.toFixed(2)}`);
 }
 load(); setInterval(load, 5000);
+{
+  const prev = [
+    '<span class="bub">ape $5 into WIF</span>',
+    '<span class="chip ok">✓ $25 per action</span><span class="chip ok">✓ freeze authority off</span>',
+    '<code>allow_swap</code><span>27.4 WIF · Raydium</span><span class="ok">✓ filled</span>',
+    '<span class="ok">✓ anchored on Solana</span><a href="/verify">Verify ↗</a>',
+  ];
+  const lis = document.querySelectorAll(".hsteps li"), bar = document.getElementById("hiwBar");
+  let i = -1;
+  const step = () => {
+    i = (i + 1) % lis.length;
+    lis.forEach((li, j) => li.classList.toggle("on", j === i));
+    document.getElementById("hiwStep").textContent = `0${i + 1} / 04`;
+    const p = document.getElementById("hiwPrev"); p.classList.remove("in"); p.innerHTML = prev[i]; void p.offsetWidth; p.classList.add("in");
+    bar.style.transition = "none"; bar.style.width = "0"; void bar.offsetWidth; bar.style.transition = "width 2.4s linear"; bar.style.width = "100%";
+  };
+  step(); setInterval(step, 2400);
+}
 </script>
 <script src="/bars.js" defer></script>
 <script src="/term.js" defer></script>
