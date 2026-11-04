@@ -22,6 +22,8 @@ claude mcp add allow -- npx -y https://useallow.xyz/downloads/allow-kit-0.1.0.tg
 
 **Demo.** `node scripts/demo.mjs BONK` pays the x402 price API, buys, sells half, prints the registry.
 
+Every claim, mapped to code and to a way to check it: [CLAIMS.md](CLAIMS.md).
+
 Install for Claude and ChatGPT: [docs/INSTALL.md](docs/INSTALL.md). Security model: [SECURITY.md](SECURITY.md).
 
 **Deploy.** `npm run pack` writes `web/downloads/allow-kit-<version>.tgz`, which the site serves for the one-line install.
