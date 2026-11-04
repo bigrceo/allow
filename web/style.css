@@ -328,3 +328,23 @@ nav#nav.mopen .wrap { -webkit-backdrop-filter: blur(18px) saturate(1.3); backdro
 .hero .panels { gap: 0; border-radius: 18px; overflow: hidden; background: rgba(14,11,10,.94); box-shadow: inset 0 0 0 1px var(--line), 0 40px 80px -40px rgba(255,90,31,.35); }
 .hero .panel { border: 0; border-radius: 0; background: transparent; backdrop-filter: none; }
 .hero .panel + .panel { border-top: 1px solid var(--line); }
+/* Skewed cards, after Volition: one slanted panel behind a glass card; hover straightens and widens it,
+   slides the glass left and lifts two floating glass chips. Each card has its own gradient. */
+.tcards { gap: 28px; }
+.skc { position: relative; display: flex; min-height: 360px; padding: 56px 0; text-decoration: none; outline: none; }
+.skp { position: absolute; top: 0; bottom: 0; left: 16%; width: 50%; border-radius: 14px; transform: skewX(15deg); background: linear-gradient(315deg, var(--from), var(--to)); transition: left .5s var(--q), width .5s var(--q), transform .5s var(--q); }
+.skp.glow { filter: blur(28px); opacity: .55; }
+.skc:hover .skp, .skc:focus-visible .skp { left: 6%; width: 72%; transform: skewX(0deg); }
+.chips { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.chip { position: absolute; left: 18%; top: 0; width: 80px; height: 80px; border-radius: 12px; opacity: 0; scale: .5; translate: 0 16px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); background: rgba(255,226,206,.1); box-shadow: inset 0 0 0 1px rgba(255,226,206,.2), 0 5px 15px rgba(0,0,0,.1); transition: opacity .5s var(--q), scale .5s var(--q), translate .5s var(--q); animation: chipfloat 5s ease-in-out infinite; }
+.chip.late { left: auto; right: 18%; top: auto; bottom: 0; translate: 0 -16px; animation-delay: -2.5s; transition-delay: .06s; }
+.skc:hover .chip, .skc:focus-visible .chip { opacity: 1; scale: 1; translate: 0 0; }
+@keyframes chipfloat { 0%, 100% { transform: translateY(5px); } 50% { transform: translateX(-5px); } }
+.skg { position: relative; z-index: 3; display: flex; flex-direction: column; width: 100%; margin: 0 20px; padding: 24px; border-radius: 16px; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); background: rgba(22,10,6,.66); box-shadow: inset 0 0 0 1px rgba(255,226,206,.14), inset 0 1px 0 rgba(255,255,255,.06), 0 24px 48px -24px rgba(0,0,0,.7); transition: translate .5s var(--q), box-shadow .5s var(--q); }
+.skc:hover .skg, .skc:focus-visible .skg { translate: -12px 0; }
+.skg h3 { margin: 24px 0 8px; font-size: 22px; font-weight: 500; letter-spacing: -.02em; color: var(--paper); }
+.skg p { flex: 1; margin: 0; font-size: 15px; line-height: 1.6; color: #c9c0b5; }
+.skg .more { display: inline-flex; align-items: center; gap: 6px; margin-top: 24px; font-size: 14px; color: #ddd3c8; transition: color .3s; }
+.skg .more svg { width: 14px; height: 14px; transition: transform .3s; }
+.skc:hover .more { color: var(--paper); } .skc:hover .more svg { transform: translateX(2px); }
+@media (prefers-reduced-motion: reduce) { .skp, .chip, .skg { transition: none !important; animation: none; } }
