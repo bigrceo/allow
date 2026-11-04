@@ -42,6 +42,7 @@ document.querySelector("nav .wrap").innerHTML = `<div class="bar">
     <button type="button" data-open="docs">Docs${chev}</button>
     <a href="/dashboard" class="${page === "/dashboard" ? "on" : ""}">Dashboard</a>
     <a href="/verify" class="${page === "/verify" ? "on" : ""}">Verify</a>
+    <a href="${BRAND.repo}">GitHub</a>
   </div>
   <div class="navr">
     <button class="ca" data-copy-ca title="Contract address">$${BRAND.ticker} <span>${BRAND.ca ? short(BRAND.ca) : "CA at launch"}</span></button>
@@ -93,3 +94,5 @@ if (nav && lights.length) {
   const day = () => { const y = 40; nav.classList.toggle("day", [...lights].some((l) => { const r = l.getBoundingClientRect(); return r.top < y && r.bottom > y; })); };
   day(); addEventListener("scroll", day, { passive: true });
 }
+for (const a of document.querySelectorAll("a[data-repo]")) a.href = BRAND.repo;
+for (const a of document.querySelectorAll("a[data-repo-claims]")) a.href = `${BRAND.repo}/blob/main/CLAIMS.md`;
