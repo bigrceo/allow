@@ -13,7 +13,8 @@ document.querySelector("nav .wrap").innerHTML = `
     <a href="/dashboard" class="${page === "/dashboard" ? "on" : ""}">Dashboard</a>
     <a href="/verify" class="hide-m ${page === "/verify" ? "on" : ""}">Verify</a>
     <a href="https://x.com/${BRAND.x}" class="hide-m">X</a>
-  </div>`;
+  </div>
+  <a class="btn" href="/docs" style="padding:9px 14px;font-size:14px">Install</a>`;
 for (const b of document.querySelectorAll("[data-copy]")) b.onclick = () => { navigator.clipboard?.writeText(b.dataset.copy); b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1400); };
 export const $ = (s) => document.querySelector(s);
 export const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);

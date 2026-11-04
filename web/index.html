@@ -9,9 +9,9 @@
 <body>
 <nav><div class="wrap"></div></nav>
 
-<header class="hero"><div class="wrap">
+<header class="hero"><div class="glow" aria-hidden="true"></div><div class="wrap hero-grid"><div>
   <div class="label">Agent wallets on Solana</div>
-  <h1 data-b="tagline">Give your agent a wallet.</h1>
+  <h1>Give your agent <span class="accent">a wallet.</span></h1>
   <p class="lead">Claude, ChatGPT or any MCP client gets its own Solana wallet and an allotment. It pays APIs over x402, trades any token through Jupiter, and writes every action to a public registry anchored on chain. Over budget, it stops. Revoked, it stops.</p>
   <div class="row" style="margin-top:28px">
     <div class="cmd"><code>npx allot-kit init</code><button data-copy="npx allot-kit init">Copy</button></div>
@@ -25,7 +25,25 @@
     <span><i class="li" style="--m:url(/logos/solana.svg);background:linear-gradient(90deg,#9945FF,#14F195)"></i>Solana</span>
     <span><img src="/logos/jupiter.svg" alt="">Jupiter</span>
   </div>
+  </div>
+  <div class="panels">
+    <div class="panel">
+      <div class="ph"><b><span data-logo></span>Agent log</b><span class="label" id="talk">Live</span></div>
+      <div class="pb" id="chatFeed"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><b><span data-logo></span>Live registry</b><span class="label">On-chain actions</span></div>
+      <div class="pb" id="actFeed"></div>
+      <a class="pf" href="/dashboard"><span>Every action</span><span>↗</span></a>
+    </div>
+  </div>
 </div></header>
+<section class="stats"><div class="wrap grid4">
+  <div><div class="big" id="sEntries">0</div><div class="label">Registry entries</div></div>
+  <div><div class="big" id="sAnch">0</div><div class="label">Solana anchors</div></div>
+  <div><div class="big" id="sSpent">$0</div><div class="label">Spent by the agent</div></div>
+  <div><div class="big" id="sLeft">$0</div><div class="label">Left in the allotment</div></div>
+</div></section>
 
 <section><div class="wrap split">
   <div>
@@ -92,6 +110,38 @@ Nothing was done.</pre>
   <span><span data-b="name">Allot</span> · <span data-b="domain">allot.fun</span> · MIT</span>
   <span>Non-custodial. Your agent's key never leaves your machine.</span>
 </div></footer>
-<script type="module" src="/common.js"></script>
+<script type="module">
+import { $, esc, short } from "/common.js";
+const ago = (t) => { const s = Math.max(0, (Date.now() - Date.parse(t)) / 1000); return s < 60 ? `${Math.round(s)}s ago` : s < 3600 ? `${Math.round(s / 60)}m ago` : s < 86400 ? `${Math.round(s / 3600)}h ago` : `${Math.round(s / 86400)}d ago`; };
+const amt = (raw, d) => (Number(raw) / 10 ** d).toLocaleString("en-US", { maximumFractionDigits: 4 });
+// The agent's own words for each registry entry: what it did, in numbers, nothing more.
+function say(e) {
+  const d = e.data;
+  if (e.kind === "swap") return d.side === "buy"
+    ? `Bought ${amt(d.out, d.outDecimals)} $${esc(d.token)} for ${amt(d.in, d.inDecimals)} ${d.quote} ($${e.usd.toFixed(2)}). Floor held, route ${esc(d.route.join(" + "))}.`
+    : `Sold ${amt(d.in, d.inDecimals)} $${esc(d.token)} for ${amt(d.out, d.outDecimals)} ${d.quote}. Sells don't touch the allotment.`;
+  if (e.kind === "pay") return `Paid $${e.usd.toFixed(4)} over x402 to ${esc(new URL(d.url).host)}: ${esc(d.description)}.`;
+  if (e.kind === "policy.set") return `New allotment from my owner: $${d.perTxUsd} per action, $${d.dailyUsd} a day, $${d.totalUsd} in total.`;
+  if (e.kind === "wallet.created") return `Wallet created on ${esc(d.cluster)}. The key stays on my owner's machine.`;
+  if (e.kind === "revoke") return "My owner revoked the allotment. I stop here.";
+  if (e.kind === "unrevoke") return "Allotment restored. Back to work, inside the caps.";
+  return esc(e.kind);
+}
+const tag = (e) => ({ swap: e.data.side === "buy" ? "Buy" : "Sell", pay: "x402", revoke: "Revoke", "policy.set": "Allotment", "wallet.created": "Wallet" })[e.kind] ?? e.kind;
+async function load() {
+  const st = await (await fetch("/api/state")).json().catch(() => ({}));
+  if (!st.ready) { $("#chatFeed").innerHTML = `<div class="it"><p>No agent yet. Run <code>npx allot-kit init</code>.</p></div>`; return; }
+  const name = esc(st.wallet.address);
+  $("#talk").textContent = st.budget.revoked ? "Revoked" : st.live ? "Live" : "Simulated fills";
+  $("#chatFeed").innerHTML = st.entries.slice(0, 12).map((e) => `<div class="it"><div class="ih"><b>agent ${short(st.wallet.address)}</b><span class="label">#${e.seq}</span><time>${ago(e.ts)}</time></div><p>${say(e)}</p></div>`).join("");
+  const acts = st.entries.filter((e) => e.kind === "swap" || e.kind === "pay").slice(0, 10);
+  $("#actFeed").innerHTML = acts.length ? acts.map((e) => { const sig = e.data.signature; return `<div class="it"><div class="ih"><b>${tag(e)}</b><span class="label">${e.data.mode ?? st.cluster}</span><time>${ago(e.ts)}</time></div><p>${say(e).split(". ")[0]}.</p><div class="row lk">${sig ? `<a href="https://solscan.io/tx/${sig}${st.cluster === "mainnet" ? "" : st.cluster === "devnet" ? "?cluster=devnet" : "?cluster=custom&customUrl=" + encodeURIComponent(st.rpc)}" target="_blank" rel="noopener">Solscan ↗</a>` : ""}<a href="/verify?seq=${e.seq}">Verify ↗</a></div></div>`; }).join("") : `<div class="it"><p>No payment or trade yet.</p></div>`;
+  $("#sEntries").textContent = st.entries.length ? st.entries[0].seq + 1 : 0;
+  $("#sAnch").textContent = st.anchors.length;
+  $("#sSpent").textContent = `$${st.budget.usedTotalUsd.toFixed(2)}`;
+  $("#sLeft").textContent = `$${(st.budget.totalUsd - st.budget.usedTotalUsd).toFixed(2)}`;
+}
+load(); setInterval(load, 5000);
+</script>
 </body>
 </html>
