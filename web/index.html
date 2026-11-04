@@ -7,9 +7,9 @@
 <link rel="icon" href="/logo.svg"><link rel="stylesheet" href="/style.css">
 </head>
 <body>
+<nav id="nav"><div class="wrap"></div></nav>
 <div class="frame">
 <canvas id="bars" aria-hidden="true"></canvas><div class="glow" aria-hidden="true"></div>
-<nav><div class="wrap"></div></nav>
 
 <header class="hero"><div class="wrap hero-grid"><div>
   <div class="label">Agent wallets on Solana</div>
@@ -46,10 +46,10 @@
   <span>Any Solana token</span><span>x402 native</span><span>Caps it can't raise</span><span>Revoke in one command</span><span>Key stays on your machine</span><span>Merkle roots on Solana</span><span>Claude and ChatGPT</span><span>Jupiter routing</span><span>Honeypots refused</span><span>Verify in your browser</span>
 </div></div>
 <section class="stats"><div class="wrap grid4">
-  <div><div class="big" id="sEntries">0</div><div class="label">Registry entries</div></div>
-  <div><div class="big" id="sAnch">0</div><div class="label">Solana anchors</div></div>
-  <div><div class="big" id="sSpent">$0</div><div class="label">Spent by the agent</div></div>
-  <div><div class="big" id="sLeft">$0</div><div class="label">Left in the allotment</div></div>
+  <div><div class="slabel"><span data-logo></span>Registry entries</div><div class="big" id="sEntries">0</div></div>
+  <div><div class="slabel"><span data-logo></span>Solana anchors</div><div class="big" id="sAnch">0</div></div>
+  <div><div class="slabel"><span data-logo></span>Spent by the agent</div><div class="big" id="sSpent">$0</div></div>
+  <div><div class="slabel"><span data-logo></span>Left in the allotment</div><div class="big" id="sLeft">$0</div></div>
 </div></section>
 
 
@@ -70,7 +70,7 @@
     <a class="btn ghost pill" href="/dashboard">Change the caps</a>
   </div>
   <div class="rules">
-    <div class="rule"><span class="label">Per action</span><b id="rPer">$25</b><p>The most one payment or buy can cost.</p><span class="label foot">Checked before signing</span></div>
+    <div class="rule"><span class="label">Per action</span><b id="rPer">$25</b><p>The most one payment or buy can cost.</p><span class="label foot">Before signing</span></div>
     <div class="rule"><span class="label">Per 24 h</span><b id="rDay">$100</b><p>Rolling window, counted from the public registry.</p><span class="label foot">Every action</span></div>
     <div class="rule"><span class="label">In total</span><b id="rTot">$250</b><p>The whole allotment. Past it, the agent stops.</p><span class="label foot">Every action</span></div>
     <div class="rule"><span class="label">Slippage</span><b id="rSlip">5%</b><p>Max price drift. Re-quoted before signing, floor enforced on chain.</p><span class="label foot">Every trade</span></div>
@@ -121,10 +121,28 @@
   <div class="label">Live</div>
   <h2 class="xl">Counted, not claimed.</h2>
   <p class="lead">Read from this agent's registry and its Solana anchors when the page loads.</p>
-  <div class="bigs">
-    <div class="bigc g1"><div class="bh"><span class="label">01 / 03</span><span class="label">Live</span></div><b id="bN">0</b><div class="bt"><h3>Actions recorded</h3><p>Payments, trades, caps and revocations</p></div><div class="bh"><span class="label">Source: registry</span><span class="label upd"></span></div></div>
-    <div class="bigc g2"><div class="bh"><span class="label">02 / 03</span><span class="label">Live</span></div><b id="bA">0</b><div class="bt"><h3>Solana anchors</h3><p>Merkle roots posted as SPL memos</p></div><div class="bh"><span class="label">Source: memo transactions</span><span class="label upd"></span></div></div>
-    <div class="bigc g3"><div class="bh"><span class="label">03 / 03</span><span class="label">Live</span></div><b id="bS">$0</b><div class="bt"><h3>Spent inside the caps</h3><p>And not one dollar past them</p></div><div class="bh"><span class="label">Source: registry</span><span class="label upd"></span></div></div>
+  <div class="stack">
+    <article class="stk" style="top:84px"><div class="statc">
+      <div class="sfield" style="--dir:90deg"></div><div class="sblob" style="left:18%;top:-10%"></div><div class="sblob b2" style="left:48%;top:10%;animation-delay:-7s"></div>
+      <div class="sdig"><span class="digits" id="bN" data-fit>0</span></div>
+      <div class="sh"><span class="label">01 / 03</span><span class="label live">Live</span></div>
+      <div class="scap"><h3>Actions recorded</h3><p>Payments, trades, caps and revocations</p></div>
+      <div class="sf"><span class="label">Source: registry</span><span class="label upd"></span></div>
+    </div></article>
+    <article class="stk" style="top:98px"><div class="statc">
+      <div class="sfield" style="--dir:270deg"></div><div class="sblob" style="left:12%;top:20%;animation-delay:-3s"></div><div class="sblob b2" style="left:52%;top:-6%;animation-delay:-10s"></div>
+      <div class="sdig"><span class="digits" id="bA" data-fit>0</span></div>
+      <div class="sh"><span class="label">02 / 03</span><span class="label live">Live</span></div>
+      <div class="scap"><h3>Solana anchors</h3><p>Merkle roots posted as SPL memos</p></div>
+      <div class="sf"><span class="label">Source: memo transactions</span><span class="label upd"></span></div>
+    </div></article>
+    <article class="stk" style="top:112px"><div class="statc">
+      <div class="sfield" style="--dir:90deg"></div><div class="sblob" style="left:30%;top:-14%;animation-delay:-5s"></div><div class="sblob b2" style="left:6%;top:30%;animation-delay:-12s"></div>
+      <div class="sdig"><span class="digits" id="bS" data-fit>0</span></div>
+      <div class="sh"><span class="label">03 / 03</span><span class="label live">Live</span></div>
+      <div class="scap"><h3>Spent inside the caps</h3><p>And not one dollar past them</p></div>
+      <div class="sf"><span class="label">Source: registry</span><span class="label upd"></span></div>
+    </div></article>
   </div>
 </div></section>
 
@@ -197,7 +215,7 @@
   <span>Non-custodial. Your agent's key never leaves your machine.</span>
 </div></footer>
 <script type="module">
-import { $, esc, short, BRAND } from "/common.js";
+import { $, esc, short, BRAND, fitDigits } from "/common.js";
 for (const id of ["gPath", "gPath2"]) document.getElementById(id)?.setAttribute("d", BRAND.logoPath);
 const ago = (t) => { const s = Math.max(0, (Date.now() - Date.parse(t)) / 1000); return s < 60 ? `${Math.round(s)}s ago` : s < 3600 ? `${Math.round(s / 60)}m ago` : s < 86400 ? `${Math.round(s / 3600)}h ago` : `${Math.round(s / 86400)}d ago`; };
 const amt = (raw, d) => (Number(raw) / 10 ** d).toLocaleString("en-US", { maximumFractionDigits: 4 });
@@ -224,9 +242,11 @@ function ava(a) {
 }
 const counted = new Set();
 function count(el, to, fmt) {
-  if (counted.has(el.id)) { el.textContent = fmt(to); return; }
+  if (counted.has(el.id)) { el.textContent = fmt(to); if (el.hasAttribute("data-fit")) fitDigits(el); return; }
   counted.add(el.id);
   const t0 = performance.now();
+  const fit = () => el.hasAttribute("data-fit") && fitDigits(el);
+  el.textContent = fmt(to); fit(); // size for the final value, so the count-up never jumps
   const step = (t) => { const k = Math.min(1, (t - t0) / 1200); el.textContent = fmt(to * (1 - (1 - k) ** 3)); if (k < 1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
 }

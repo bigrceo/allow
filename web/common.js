@@ -27,3 +27,26 @@ export const $ = (s) => document.querySelector(s);
 export const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 export { BRAND };
 if (BRAND.ca && document.querySelector("#ca")) document.querySelector("#ca").textContent = BRAND.ca;
+
+// Nav turns to glass once the page leaves the top.
+const nav = document.querySelector("nav#nav");
+if (nav) { const on = () => nav.classList.toggle("glass", scrollY > 12); on(); addEventListener("scroll", on, { passive: true }); }
+
+// Hero rises on load; everything else reveals as it scrolls in, staggered inside each block.
+document.querySelectorAll(".hero-grid > div:first-child > *, .hero .panels").forEach((el, i) => { el.classList.add("rise"); el.style.animationDelay = `${i * 90}ms`; });
+const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
+document.querySelectorAll("section .wrap > *, .tcards > *, .rules > *, .links3 > *").forEach((el) => {
+  if (el.closest(".hero") || el.classList.contains("stack")) return;
+  const sib = [...el.parentElement.children].indexOf(el);
+  el.classList.add("rv"); el.style.setProperty("--d", `${Math.min(sib, 5) * 90}ms`); io.observe(el);
+});
+
+// Big digits scale to their length so they always fit the card (cqw = card width).
+export function fitDigits(el) { el.style.fontSize = `min(${(150 / Math.max(2, el.textContent.length)).toFixed(2)}cqw, var(--cap))`; }
+
+// Over a light section the nav switches to its day look.
+const lights = document.querySelectorAll(".frame-l");
+if (nav && lights.length) {
+  const day = () => { const y = 40; nav.classList.toggle("day", [...lights].some((l) => { const r = l.getBoundingClientRect(); return r.top < y && r.bottom > y; })); };
+  day(); addEventListener("scroll", day, { passive: true });
+}
