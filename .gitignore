@@ -3,3 +3,4 @@ node_modules
 *.log
 .env*
 .allot-test
+web/downloads

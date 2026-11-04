@@ -26,5 +26,6 @@ export function registerTools(server) {
     safe(core.quote),
   );
   server.tool("allot_swap", "Execute a quote from allot_quote. Re-prices first and aborts if the market moved past the floor shown. Counts against the allotment and is written to the public registry.", { quoteId: z.string() }, safe(core.swap));
+  server.tool("allot_token", `The $${BRAND.ticker} token, read from Solana mainnet: supply, price, market cap, largest holders.`, {}, safe(core.token));
   server.tool("allot_history", "The agent's public registry: every payment and trade, hash-chained, signed, anchored on Solana.", { limit: z.number().int().min(1).max(100).optional() }, safe(core.history));
 }

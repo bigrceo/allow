@@ -26,6 +26,7 @@ const HELP = `${BRAND.name}. ${BRAND.tagline}
   allot pay <url>             pay an x402 endpoint
   allot buy <token> <sol>     quote then swap (simulated unless mainnet + ALLOT_LIVE=1)
   allot sell <token> <amt>
+  allot token                 $ALLOT on chain: supply, price, holders
   allot history               the public registry
   allot anchor                anchor pending entries on Solana now
   allot revoke [--sweep]      stop the agent; --sweep sends the funds to the owner
@@ -67,6 +68,7 @@ async function main() {
     }
     case "quote": show(await core.quote({ side: args[0], token: args[1], amount: Number(args[2]) })); break;
     case "swap": show(await core.swap({ quoteId: args[0] })); break;
+    case "token": show(await core.token()); break;
     case "history": show(await core.history({ limit: Number(args[0] || 20) })); break;
     case "anchor": show((await anchor(need())) ?? "Nothing to anchor."); break;
     case "revoke": {

@@ -3,14 +3,14 @@
 **Give your agent a wallet.** Claude, ChatGPT or any MCP client gets a Solana wallet with an allotment. It pays APIs over x402, trades any Solana token through Jupiter, and every action lands in a public registry anchored on Solana.
 
 ```bash
-npx allot-kit init          # wallet + allotment in ~/.allot
-npx allot-kit serve         # site, dashboard, /verify on :4340
-claude mcp add allot -- npx -y allot-kit mcp
+npm i -g https://allot.fun/downloads/allot-kit-0.1.0.tgz && allot init          # wallet + allotment in ~/.allot
+allot serve         # site, dashboard, /verify on :4340
+claude mcp add allot -- npx -y https://allot.fun/downloads/allot-kit-0.1.0.tgz mcp
 ```
 
 | Part | Where |
 |---|---|
-| MCP tools: `allot_wallet` `allot_budget` `allot_pay` `allot_quote` `allot_swap` `allot_history` | `mcp/tools.mjs` (stdio `mcp/server.mjs`, HTTP `/mcp/<key>`) |
+| MCP tools: `allot_wallet` `allot_budget` `allot_pay` `allot_quote` `allot_swap` `allot_token` `allot_history` | `mcp/tools.mjs` (stdio `mcp/server.mjs`, HTTP `/mcp/<key>`) |
 | Wallet + allotment (caps, pay list, token list, expiry, revoke, sweep) | `lib/wallet.mjs`, `lib/core.mjs#guard` |
 | x402 client and seller (Solana, `exact` scheme) | `lib/x402.mjs`, demo endpoints `/x402/price`, `/x402/sol` |
 | Trading (Jupiter, ported from SAY) | `lib/jupiter.mjs`, `lib/core.mjs#quote/swap` |
@@ -23,3 +23,5 @@ claude mcp add allot -- npx -y allot-kit mcp
 **Demo.** `node scripts/demo.mjs BONK` pays the x402 price API, buys, sells half, prints the registry.
 
 Install for Claude and ChatGPT: [docs/INSTALL.md](docs/INSTALL.md). Security model: [SECURITY.md](SECURITY.md).
+
+**Deploy.** `npm run pack` writes `web/downloads/allot-kit-<version>.tgz`, which the site serves for the one-line install.

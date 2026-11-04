@@ -1,8 +1,9 @@
 // Brand comes from /brand.mjs only. Every page fills its placeholders from it.
-import { BRAND, logoSvg } from "/brand.mjs";
+import { BRAND, installCmd, logoSvg } from "/brand.mjs";
 document.documentElement.style.setProperty("--accent", BRAND.color);
 for (const el of document.querySelectorAll("[data-b]")) el.textContent = BRAND[el.dataset.b];
 for (const el of document.querySelectorAll("[data-logo]")) el.innerHTML = logoSvg(el.dataset.logo || BRAND.color);
+for (const el of document.querySelectorAll("[data-install]")) { const c = installCmd(el.dataset.install || "init"); el.textContent = c; el.nextElementSibling?.setAttribute?.("data-copy", c); }
 for (const el of document.querySelectorAll("a[data-x]")) el.href = `https://x.com/${BRAND.x}`;
 document.title = document.title.replace("{name}", BRAND.name).replace("{tagline}", BRAND.tagline);
 export const short = (a) => (a ? `${a.slice(0, 4)}…${a.slice(-4)}` : "");

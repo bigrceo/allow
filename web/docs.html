@@ -12,30 +12,31 @@
   <h2>Two minutes to a funded agent.</h2>
 
   <h3 style="margin-top:36px">1 · Create the wallet</h3>
-  <p>Node 20 or newer. The key is written to <code>~/.allot/agent.json</code> (mode 600). It never leaves your machine.</p>
-  <pre>npx allot-kit init
-npx allot-kit policy perTxUsd 10      # cap per action
-npx allot-kit policy dailyUsd 50      # cap per 24 h
-npx allot-kit policy owner &lt;your wallet&gt;   # where revoke --sweep sends funds</pre>
+  <p>Node 20 or newer. The kit installs straight from this site (<code>npx allot-kit</code> once it is on npm). The key is written to <code>~/.allot/agent.json</code> (mode 600). It never leaves your machine.</p>
+  <pre>npm i -g https://allot.fun/downloads/allot-kit-0.1.0.tgz
+allot init
+allot policy perTxUsd 10      # cap per action
+allot policy dailyUsd 50      # cap per 24 h
+allot policy owner &lt;your wallet&gt;   # where revoke --sweep sends funds</pre>
   <p>Fund it: send SOL or USDC to the address it printed. Testing? <code>ALLOT_CLUSTER=devnet</code> (the default) or <code>localnet</code>.</p>
 
   <h3 style="margin-top:36px"><i class="li" style="--m:url(/logos/claude.svg);color:#D97757;vertical-align:-4px"></i> Claude Desktop</h3>
   <p>Settings → Developer → Edit Config, then add:</p>
   <pre>{
   "mcpServers": {
-    "allot": { "command": "npx", "args": ["-y", "allot-kit", "mcp"] }
+    "allot": { "command": "npx", "args": ["-y", "https://allot.fun/downloads/allot-kit-0.1.0.tgz", "mcp"] }
   }
 }</pre>
   <p>Restart Claude. Ask: <i>"What's my Allot budget?"</i></p>
 
   <h3 style="margin-top:36px"><i class="li" style="--m:url(/logos/claude.svg);color:#D97757;vertical-align:-4px"></i> Claude Code</h3>
-  <pre>claude mcp add allot -- npx -y allot-kit mcp</pre>
+  <pre>claude mcp add allot -- npx -y https://allot.fun/downloads/allot-kit-0.1.0.tgz mcp</pre>
 
   <h3 style="margin-top:36px"><i class="li" style="--m:url(/logos/openai.svg);vertical-align:-4px"></i> ChatGPT</h3>
   <p>ChatGPT talks to remote MCP servers over HTTPS. Run the server and expose it with a tunnel:</p>
-  <pre>npx allot-kit serve                      # http://localhost:4340
+  <pre>allot serve                      # http://localhost:4340
 cloudflared tunnel --url http://localhost:4340
-npx allot-kit config chatgpt             # prints the secret MCP path</pre>
+allot config chatgpt             # prints the secret MCP path</pre>
   <p>In ChatGPT: Settings → Apps &amp; Connectors → Advanced → Developer mode, then Create. Paste <code>https://&lt;tunnel&gt;/mcp/&lt;key&gt;</code>, authentication none. The key in the path is the secret; the owner controls (allotment, revoke) are never reachable through the tunnel.</p>
 
   <h3 style="margin-top:36px">CLI</h3>
